@@ -17,11 +17,9 @@ let longPressButtonDefaultTag = 40
 
 class DetailTableViewController: UITableViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
-   
     var index:Int?
     var subModelArray:[Any]!
     let imagePicker = UIImagePickerController()
-    var editedModel:String?
     var selectedRowIndex = 0
     var viewHasMoved = false
     var movingCellIndexPath : NSIndexPath? = nil
@@ -188,7 +186,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         
-        if ((subModelArray[indexPath.row] as? UIImage) != nil)
+        if ((subModelArray[indexPath.row] as? customImage) != nil)
         {
             if(viewHasMoved == true)
             {
@@ -233,6 +231,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             let myTextField : UITextField! = cell.contentView.viewWithTag(textFieldDefaultTag) as! UITextField!
             let myImageView : UIImageView! = cell.contentView.viewWithTag(imageViewDefaultTag) as! UIImageView!
             myImageView.image = nil
+            
             myTextField.delegate = self
             myTextField.font = .systemFont(ofSize: 18)
             myTextField.text = subModelArray[indexPath.row] as? String
@@ -269,7 +268,8 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             let myImageView : UIImageView! = cell.contentView.viewWithTag(imageViewDefaultTag) as! UIImageView!
             myImageView.frame = CGRect(x : 30, y: 5, width : tableView.frame.size.width-60, height:300)
             myImageView.contentMode = UIViewContentMode.scaleAspectFit
-            
+
+           
             let longPressButton : UIButton! = cell.contentView.viewWithTag(longPressButtonDefaultTag) as! UIButton!
             longPressButton.frame = CGRect(x: myImageView.frame.origin.x+myImageView.frame.size.width-10,y: myImageView.frame.origin.y+10,width:28,height:28)
             longPressButton.isHidden = false
@@ -282,7 +282,11 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             let tapImageView = UITapGestureRecognizer(target: self, action: #selector(self.tapGestureForImageView(_:)))
             myImageView.addGestureRecognizer(tapImageView)
             
-            myImageView.image = subModelArray[indexPath.row] as? UIImage
+            let customImageObj = subModelArray[indexPath.row] as? customImage
+            myImageView.image = customImageObj?.image
+            print("Image description : \(customImageObj?.imageDescription ?? "")")
+            
+            //myImageView.image = subModelArray[indexPath.row] as? UIImage
         }
         cell.selectionStyle = .none
         // Configure the cell...
@@ -341,7 +345,10 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     {
         
         if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
-            subModelArray.insert(image, at: selectedRowIndex+1)
+            let customImageObj = customImage(image:image, imageDescription:"Image added")
+            subModelArray.insert(customImageObj, at: selectedRowIndex+1)
+            //subModelArray.insert(image, at: selectedRowIndex+1)
+            
             tableView.reloadData()
         }
         self.dismiss(animated: true, completion: nil)
@@ -357,9 +364,15 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
                 let cell = tableView.cellForRow(at: (indexPaths[i]) as IndexPath)
                 let myTextField : UITextField? = cell?.contentView.viewWithTag(textFieldDefaultTag) as? UITextField
                 let myImageView : UIImageView? = cell?.contentView.viewWithTag(imageViewDefaultTag) as? UIImageView
+            
+               
                 if(myImageView?.image != nil)
                 {
-                    subModelArray.append(myImageView?.image! as Any)
+                    let myCustomImage = customImage(image: (myImageView?.image)!, imageDescription: "Sample description")
+                    subModelArray.append(myCustomImage as Any)
+                    
+                    //subModelArray.append(myImageView?.image! as Any)
+                
                 }
                 else
                 {

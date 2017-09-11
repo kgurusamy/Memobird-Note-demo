@@ -18,6 +18,7 @@
 		33437F9F1F664A980031A16A /* delete_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 33437F9C1F664A980031A16A /* delete_icon.png */; };
 		33437FA01F664A980031A16A /* edit_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 33437F9D1F664A980031A16A /* edit_icon.png */; };
 		33437FA21F66544A0031A16A /* move_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 33437FA11F66544A0031A16A /* move_icon.png */; };
+		33437FA61F6685BB0031A16A /* CustomImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33437FA51F6685BB0031A16A /* CustomImage.swift */; };
 		C978B4B51F61221300441680 /* expand.png in Resources */ = {isa = PBXBuildFile; fileRef = C978B4B41F61221300441680 /* expand.png */; };
 /* End PBXBuildFile section */
 
@@ -35,6 +36,7 @@
 		33437F9C1F664A980031A16A /* delete_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = delete_icon.png; sourceTree = "<group>"; };
 		33437F9D1F664A980031A16A /* edit_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = edit_icon.png; sourceTree = "<group>"; };
 		33437FA11F66544A0031A16A /* move_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = move_icon.png; sourceTree = "<group>"; };
+		33437FA51F6685BB0031A16A /* CustomImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomImage.swift; sourceTree = "<group>"; };
 		C978B4B41F61221300441680 /* expand.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = expand.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -73,6 +75,7 @@
 				336BE1A11F62D1A200E69083 /* images */,
 				336BE1A01F62D16100E69083 /* storyboard views */,
 				05979C981BC1872D00F5EA5F /* Assets.xcassets */,
+				33437FA51F6685BB0031A16A /* CustomImage.swift */,
 				336BE19F1F62D14900E69083 /* viewControllers */,
 				05979C911BC1872D00F5EA5F /* AppDelegate.swift */,
 				05979C9D1BC1872D00F5EA5F /* Info.plist */,
@@ -199,6 +202,7 @@
 			files = (
 				05979CA61BC19BC700F5EA5F /* DetailTableViewController.swift in Sources */,
 				05979CA41BC1898C00F5EA5F /* MainTableViewController.swift in Sources */,
+				33437FA61F6685BB0031A16A /* CustomImage.swift in Sources */,
 				05979C921BC1872D00F5EA5F /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
