@@ -12,6 +12,8 @@ import AssetsLibrary
 
 let textFieldDefaultTag = 10
 let imageViewDefaultTag = 20
+let imageOptionsViewDefaultTag = 30
+let longPressButtonDefaultTag = 40
 
 class DetailTableViewController: UITableViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
@@ -31,8 +33,8 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         
 //Drag and drop long press gesture on tableview cell
         
-        let longpress = UILongPressGestureRecognizer(target: self, action: #selector(DetailTableViewController.longPressGestureRecognized(_:)))
-        tableView.addGestureRecognizer(longpress)
+//        let longpress = UILongPressGestureRecognizer(target: self, action: #selector(DetailTableViewController.longPressGestureRecognized(_:)))
+//        tableView.addGestureRecognizer(longpress)
         tableView.rowHeight = UITableViewAutomaticDimension
         print("subModelArrayCount : \(subModelArray.count)")
 
@@ -161,6 +163,26 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+   @IBAction func tapGestureForImageView(_ gestureRecognizer: UITapGestureRecognizer)
+    {
+        let currentCell : UITableViewCell! = gestureRecognizer.view?.superview?.superview as! UITableViewCell
+        let currentIndexpath : NSIndexPath! = tableView.indexPath(for: currentCell)! as NSIndexPath
+        
+        let myImageOptionsView : UIView! = currentCell.contentView.viewWithTag(imageOptionsViewDefaultTag) as UIView!
+        
+        if(myImageOptionsView.isHidden == false){
+            
+            myImageOptionsView.isHidden = true
+        }
+        else
+        {
+            myImageOptionsView.isHidden = false
+        }
+        
+        print("Imageview tapped on \(currentIndexpath!.row)")
+                
+    }
 
     // MARK: - TABLEVIEW DELEGATE methods
     
@@ -217,6 +239,14 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             myTextField.frame = CGRect(x: 0, y: 0, width: tableView.frame.size.width-30, height:cell.contentView.frame.size.height)
             myTextField.addTarget(self, action: #selector(textFieldDidChange(textField:)), for: .editingChanged)
             myTextField.autocorrectionType = .no
+            myTextField.isHidden = false
+            
+            let longPressButton : UIButton! = cell.contentView.viewWithTag(longPressButtonDefaultTag) as! UIButton!
+            longPressButton.isHidden = true
+            
+            let myImageOptionsView : UIView! = cell.contentView.viewWithTag(imageOptionsViewDefaultTag) as UIView!
+            myImageOptionsView.isHidden = true
+            
         }
         else
         {
@@ -233,10 +263,25 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
                 }
             }
             let myTextField : UITextField! = cell.contentView.viewWithTag(textFieldDefaultTag) as! UITextField!
-            myTextField.text = ""
+            myTextField.isHidden = true
+            
+            
             let myImageView : UIImageView! = cell.contentView.viewWithTag(imageViewDefaultTag) as! UIImageView!
             myImageView.frame = CGRect(x : 30, y: 5, width : tableView.frame.size.width-60, height:300)
             myImageView.contentMode = UIViewContentMode.scaleAspectFit
+            
+            let longPressButton : UIButton! = cell.contentView.viewWithTag(longPressButtonDefaultTag) as! UIButton!
+            longPressButton.frame = CGRect(x: myImageView.frame.origin.x+myImageView.frame.size.width-10,y: myImageView.frame.origin.y+10,width:28,height:28)
+            longPressButton.isHidden = false
+            
+            // Assign long press event for the Image for drag and drop
+            let longpress = UILongPressGestureRecognizer(target: self, action: #selector(self.longPressGestureRecognized(_:)))
+            longPressButton.addGestureRecognizer(longpress)
+            
+            // Image tap event
+            let tapImageView = UITapGestureRecognizer(target: self, action: #selector(self.tapGestureForImageView(_:)))
+            myImageView.addGestureRecognizer(tapImageView)
+            
             myImageView.image = subModelArray[indexPath.row] as? UIImage
         }
         cell.selectionStyle = .none
@@ -268,6 +313,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             print("option menu presented")
         }
     }
+    
     func openCamera()
     {
         if(UIImagePickerController .isSourceTypeAvailable(UIImagePickerControllerSourceType.camera))
@@ -371,6 +417,17 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     }
     
     // MARK: - Custom methods
+    
+// Delete image action
+    @IBAction func delete_image_clicked(_ sender : UIButton)
+    {
+        let currentCell : UITableViewCell! = sender.superview?.superview?.superview as! UITableViewCell
+        let currentIndexpath : NSIndexPath! = tableView.indexPath(for: currentCell)! as NSIndexPath
+        let myImageOptionsView : UIView! = currentCell.contentView.viewWithTag(imageOptionsViewDefaultTag) as UIView!
+        myImageOptionsView.isHidden = true
+        deleteCell(tag: currentIndexpath.row)
+    }
+    
  //Deleting string backspace
     func deleteCell(tag : Int)
     {
