@@ -14,6 +14,7 @@ let textFieldDefaultTag = 10
 let imageViewDefaultTag = 20
 let imageOptionsViewDefaultTag = 30
 let longPressButtonDefaultTag = 40
+let imageDescriptionDefaultTag = 50
 
 class DetailTableViewController: UITableViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
@@ -246,6 +247,9 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             let myImageOptionsView : UIView! = cell.contentView.viewWithTag(imageOptionsViewDefaultTag) as UIView!
             myImageOptionsView.isHidden = true
             
+            let myphotoedittextfiled : UITextField! = cell.contentView.viewWithTag(imageDescriptionDefaultTag) as! UITextField!
+            myphotoedittextfiled.isHidden = true
+
         }
         else
         {
@@ -266,7 +270,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             
             
             let myImageView : UIImageView! = cell.contentView.viewWithTag(imageViewDefaultTag) as! UIImageView!
-            myImageView.frame = CGRect(x : 30, y: 5, width : tableView.frame.size.width-60, height:300)
+            myImageView.frame = CGRect(x : 30, y: 5, width : tableView.frame.size.width-60, height:200)
             myImageView.contentMode = UIViewContentMode.scaleAspectFit
 
            
@@ -285,8 +289,27 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             let customImageObj = subModelArray[indexPath.row] as? customImage
             myImageView.image = customImageObj?.image
             print("Image description : \(customImageObj?.imageDescription ?? "")")
-            
+             let imageDescription : UITextField! = cell.contentView.viewWithTag(imageDescriptionDefaultTag) as? UITextField
             //myImageView.image = subModelArray[indexPath.row] as? UIImage
+           
+                imageDescription?.frame = CGRect(x : 30, y: 208, width : tableView.frame.size.width-60, height:30)
+            //imageDescription.backgroundColor = .lightGray
+            imageDescription.delegate = self
+            imageDescription.font = .systemFont(ofSize: 12)
+            imageDescription.placeholder = "Picture Description"
+            //imageDescription.text = subModelArray[indexPath.row] as? String
+           // imageDescription.addTarget(self, action: #selector(phototextFieldDidChange(textField:)), for: .editingChanged)
+            imageDescription.autocorrectionType = .no
+            if((customImageObj?.imageDescription.characters.count)! > 0)
+            {
+            imageDescription.text = customImageObj?.imageDescription
+            imageDescription.isHidden = false
+            }else{
+                imageDescription.isHidden = true
+
+            }
+            //myphotoedittextfiled.isHidden = false
+
         }
         cell.selectionStyle = .none
         // Configure the cell...
@@ -345,7 +368,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     {
         
         if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
-            let customImageObj = customImage(image:image, imageDescription:"Image added")
+            let customImageObj = customImage(image:image, imageDescription:"")
             subModelArray.insert(customImageObj, at: selectedRowIndex+1)
             //subModelArray.insert(image, at: selectedRowIndex+1)
             
@@ -364,11 +387,11 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
                 let cell = tableView.cellForRow(at: (indexPaths[i]) as IndexPath)
                 let myTextField : UITextField? = cell?.contentView.viewWithTag(textFieldDefaultTag) as? UITextField
                 let myImageView : UIImageView? = cell?.contentView.viewWithTag(imageViewDefaultTag) as? UIImageView
-            
+            let imageDescription : UITextField? = cell?.contentView.viewWithTag(imageDescriptionDefaultTag) as? UITextField
                
                 if(myImageView?.image != nil)
                 {
-                    let myCustomImage = customImage(image: (myImageView?.image)!, imageDescription: "Sample description")
+                    let myCustomImage = customImage(image: (myImageView?.image)!, imageDescription: (imageDescription?.text)!)
                     subModelArray.append(myCustomImage as Any)
                     
                     //subModelArray.append(myImageView?.image! as Any)
@@ -386,27 +409,36 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     }
     
     // MARK: - TextField Methods
-  
+  //myphotoedittextfiled
+
+
     func textFieldDidChange(textField: UITextField) {
         
-        let currentCell : UITableViewCell! = textField.superview?.superview as! UITableViewCell
-        let currentIndexpath : NSIndexPath! = tableView.indexPath(for: currentCell)! as NSIndexPath
-        selectedRowIndex = currentIndexpath!.row
-        subModelArray[currentIndexpath!.row] = textField.text!
+        if(textField.tag != imageDescriptionDefaultTag)
+        {
+            let currentCell : UITableViewCell! = textField.superview?.superview as! UITableViewCell
+            let currentIndexpath : NSIndexPath! = tableView.indexPath(for: currentCell)! as NSIndexPath
+            selectedRowIndex = currentIndexpath!.row
+            subModelArray[currentIndexpath!.row] = textField.text!
+        }
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {   //delegate method
+        if(textField.tag != imageDescriptionDefaultTag)
+        {
         let currentCell : UITableViewCell! = textField.superview?.superview as! UITableViewCell
         let currentIndexpath : NSIndexPath! = tableView.indexPath(for: currentCell)! as NSIndexPath
         selectedRowIndex = currentIndexpath!.row
 
         createNewCell(tag: (currentIndexpath!.row))
-        
+        }
         return true
     }
  
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
         
+        if(textField.tag != imageDescriptionDefaultTag)
+        {
         if(string.isEmpty)
         {
             if let selectedRange = textField.selectedTextRange {
@@ -426,11 +458,38 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             }
             print("Backspace pressed")
         }
-        return true
+        }
+        let currentCharacterCount = textField.text?.characters.count ?? 0
+        if (range.length + range.location > currentCharacterCount){
+            return false
+        }
+        let newLength = currentCharacterCount + string.characters.count - range.length
+        if(newLength <= 36)
+        {
+            
+        }else
+        {
+            let currentCell : UITableViewCell! = textField.superview?.superview as! UITableViewCell
+            let currentIndexpath : NSIndexPath! = tableView.indexPath(for: currentCell)! as NSIndexPath
+            selectedRowIndex = currentIndexpath!.row
+            
+            createNewCell(tag: (currentIndexpath!.row))
+        }
+        return newLength <= 36
     }
-    
+
+    @IBAction func photo_discription_btn(_ sender: UIButton)
+    {
+        let currentCell : UITableViewCell! = sender.superview?.superview?.superview as! UITableViewCell
+        let currentIndexpath : NSIndexPath! = tableView.indexPath(for: currentCell)! as NSIndexPath
+        let myImageOptionsView : UIView! = currentCell.contentView.viewWithTag(imageOptionsViewDefaultTag) as UIView!
+         var myphotoedittextfiled : UITextField! = currentCell.contentView.viewWithTag(imageDescriptionDefaultTag) as! UITextField!
+        myphotoedittextfiled.isHidden = false
+        myImageOptionsView.isHidden = true
+    }
     // MARK: - Custom methods
     
+ 
 // Delete image action
     @IBAction func delete_image_clicked(_ sender : UIButton)
     {
