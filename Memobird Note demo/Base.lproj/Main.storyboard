@@ -69,7 +69,7 @@
                                             <gestureRecognizers/>
                                         </imageView>
                                         <view hidden="YES" tag="30" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="u1Z-Jd-k3Z">
-                                            <rect key="frame" x="24" y="18" width="105" height="28"/>
+                                            <rect key="frame" x="24" y="18" width="142" height="28"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <subviews>
                                                 <button opaque="NO" tag="31" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="bAq-t7-a5u" userLabel="editButton">
@@ -86,6 +86,16 @@
                                                     <state key="normal" image="delete_icon.png"/>
                                                     <connections>
                                                         <action selector="delete_image_clicked:" destination="cfR-wC-pCf" eventType="touchUpInside" id="G8n-0f-bNA"/>
+                                                    </connections>
+                                                </button>
+                                                <button opaque="NO" tag="60" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ysj-bd-cbf">
+                                                    <rect key="frame" x="64" y="0.0" width="28" height="28"/>
+                                                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                                    <state key="normal" image="crop_icon.png">
+                                                        <color key="titleColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                                    </state>
+                                                    <connections>
+                                                        <action selector="crop_btn:" destination="cfR-wC-pCf" eventType="touchUpInside" id="jaF-Zo-eyf"/>
                                                     </connections>
                                                 </button>
                                             </subviews>
@@ -159,6 +169,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="crop_icon.png" width="32" height="32"/>
         <image name="delete_icon.png" width="32" height="32"/>
         <image name="edit_icon.png" width="32" height="32"/>
         <image name="move_icon.png" width="32" height="32"/>

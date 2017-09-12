@@ -19,6 +19,15 @@
 		33437FA01F664A980031A16A /* edit_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 33437F9D1F664A980031A16A /* edit_icon.png */; };
 		33437FA21F66544A0031A16A /* move_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 33437FA11F66544A0031A16A /* move_icon.png */; };
 		33437FA61F6685BB0031A16A /* CustomImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33437FA51F6685BB0031A16A /* CustomImage.swift */; };
+		C951CA3E1F67E78200CB5668 /* CropRectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C951CA351F67E78200CB5668 /* CropRectView.swift */; };
+		C951CA3F1F67E78200CB5668 /* CropView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C951CA361F67E78200CB5668 /* CropView.swift */; };
+		C951CA401F67E78200CB5668 /* CropViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C951CA381F67E78200CB5668 /* CropViewController.swift */; };
+		C951CA411F67E78200CB5668 /* PhotoCropEditorBorder.png in Resources */ = {isa = PBXBuildFile; fileRef = C951CA391F67E78200CB5668 /* PhotoCropEditorBorder.png */; };
+		C951CA421F67E78200CB5668 /* PhotoCropEditorBorder@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = C951CA3A1F67E78200CB5668 /* PhotoCropEditorBorder@2x.png */; };
+		C951CA431F67E78200CB5668 /* PhotoCropEditorBorder@3x.png in Resources */ = {isa = PBXBuildFile; fileRef = C951CA3B1F67E78200CB5668 /* PhotoCropEditorBorder@3x.png */; };
+		C951CA441F67E78200CB5668 /* ResizeControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = C951CA3C1F67E78200CB5668 /* ResizeControl.swift */; };
+		C951CA451F67E78200CB5668 /* UIImage+Crop.swift in Sources */ = {isa = PBXBuildFile; fileRef = C951CA3D1F67E78200CB5668 /* UIImage+Crop.swift */; };
+		C951CA471F67E7EA00CB5668 /* PhotoCropEditor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C951CA461F67E7EA00CB5668 /* PhotoCropEditor.framework */; };
 		C978B4B51F61221300441680 /* expand.png in Resources */ = {isa = PBXBuildFile; fileRef = C978B4B41F61221300441680 /* expand.png */; };
 /* End PBXBuildFile section */
 
@@ -37,6 +46,17 @@
 		33437F9D1F664A980031A16A /* edit_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = edit_icon.png; sourceTree = "<group>"; };
 		33437FA11F66544A0031A16A /* move_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = move_icon.png; sourceTree = "<group>"; };
 		33437FA51F6685BB0031A16A /* CustomImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomImage.swift; sourceTree = "<group>"; };
+		C951CA291F67E24100CB5668 /* PhotoCropEditor.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PhotoCropEditor.framework; path = "Memobird Note demo/CropViewController/PhotoCropEditor.framework"; sourceTree = "<group>"; };
+		C951CA351F67E78200CB5668 /* CropRectView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CropRectView.swift; sourceTree = "<group>"; };
+		C951CA361F67E78200CB5668 /* CropView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CropView.swift; sourceTree = "<group>"; };
+		C951CA371F67E78200CB5668 /* CropViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CropViewController.h; sourceTree = "<group>"; };
+		C951CA381F67E78200CB5668 /* CropViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CropViewController.swift; sourceTree = "<group>"; };
+		C951CA391F67E78200CB5668 /* PhotoCropEditorBorder.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = PhotoCropEditorBorder.png; sourceTree = "<group>"; };
+		C951CA3A1F67E78200CB5668 /* PhotoCropEditorBorder@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "PhotoCropEditorBorder@2x.png"; sourceTree = "<group>"; };
+		C951CA3B1F67E78200CB5668 /* PhotoCropEditorBorder@3x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "PhotoCropEditorBorder@3x.png"; sourceTree = "<group>"; };
+		C951CA3C1F67E78200CB5668 /* ResizeControl.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResizeControl.swift; sourceTree = "<group>"; };
+		C951CA3D1F67E78200CB5668 /* UIImage+Crop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIImage+Crop.swift"; sourceTree = "<group>"; };
+		C951CA461F67E7EA00CB5668 /* PhotoCropEditor.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PhotoCropEditor.framework; path = "Memobird Note demo/PhotoCropEditor.framework"; sourceTree = "<group>"; };
 		C978B4B41F61221300441680 /* expand.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = expand.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -45,6 +65,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C951CA471F67E7EA00CB5668 /* PhotoCropEditor.framework in Frameworks */,
 				3312A1AD1F5D78ED00894A7B /* AssetsLibrary.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -72,13 +93,12 @@
 		05979C901BC1872D00F5EA5F /* Memobird Note Demo */ = {
 			isa = PBXGroup;
 			children = (
-				33F8EAF91F678C240083FB72 /* Model */,
-				336BE1A11F62D1A200E69083 /* images */,
-				336BE1A01F62D16100E69083 /* storyboard views */,
-				05979C981BC1872D00F5EA5F /* Assets.xcassets */,
-				336BE19F1F62D14900E69083 /* viewControllers */,
 				05979C911BC1872D00F5EA5F /* AppDelegate.swift */,
-				05979C9D1BC1872D00F5EA5F /* Info.plist */,
+				C951CA4F1F67FA2600CB5668 /* Model */,
+				336BE1A01F62D16100E69083 /* View */,
+				336BE19F1F62D14900E69083 /* Controller */,
+				C951CA501F67FA7B00CB5668 /* Resource */,
+				C951CA511F67FABA00CB5668 /* PhotoCropEditorLib */,
 			);
 			name = "Memobird Note Demo";
 			path = "Memobird Note demo";
@@ -87,32 +107,37 @@
 		3312A1AB1F5D78ED00894A7B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C951CA461F67E7EA00CB5668 /* PhotoCropEditor.framework */,
+				C951CA291F67E24100CB5668 /* PhotoCropEditor.framework */,
 				3312A1AC1F5D78ED00894A7B /* AssetsLibrary.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-		336BE19F1F62D14900E69083 /* viewControllers */ = {
+		336BE19F1F62D14900E69083 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
 				05979CA31BC1898C00F5EA5F /* MainTableViewController.swift */,
 				05979CA51BC19BC700F5EA5F /* DetailTableViewController.swift */,
 			);
-			name = viewControllers;
+			name = Controller;
 			sourceTree = "<group>";
 		};
-		336BE1A01F62D16100E69083 /* storyboard views */ = {
+		336BE1A01F62D16100E69083 /* View */ = {
 			isa = PBXGroup;
 			children = (
 				05979C951BC1872D00F5EA5F /* Main.storyboard */,
 				05979C9A1BC1872D00F5EA5F /* LaunchScreen.storyboard */,
 			);
-			name = "storyboard views";
+			name = View;
 			sourceTree = "<group>";
 		};
 		336BE1A11F62D1A200E69083 /* images */ = {
 			isa = PBXGroup;
 			children = (
+				C951CA391F67E78200CB5668 /* PhotoCropEditorBorder.png */,
+				C951CA3A1F67E78200CB5668 /* PhotoCropEditorBorder@2x.png */,
+				C951CA3B1F67E78200CB5668 /* PhotoCropEditorBorder@3x.png */,
 				33437FA11F66544A0031A16A /* move_icon.png */,
 				33437F9B1F664A980031A16A /* crop_icon.png */,
 				33437F9C1F664A980031A16A /* delete_icon.png */,
@@ -122,7 +147,8 @@
 			name = images;
 			sourceTree = "<group>";
 		};
-		33F8EAF91F678C240083FB72 /* Model */ = {
+
+		C951CA4F1F67FA2600CB5668 /* Model */ = {
 			isa = PBXGroup;
 			children = (
 				33437FA51F6685BB0031A16A /* CustomImage.swift */,
@@ -130,6 +156,31 @@
 			name = Model;
 			sourceTree = "<group>";
 		};
+
+		C951CA501F67FA7B00CB5668 /* Resource */ = {
+			isa = PBXGroup;
+			children = (
+				05979C981BC1872D00F5EA5F /* Assets.xcassets */,
+				05979C9D1BC1872D00F5EA5F /* Info.plist */,
+				336BE1A11F62D1A200E69083 /* images */,
+			);
+			name = Resource;
+			sourceTree = "<group>";
+		};
+		C951CA511F67FABA00CB5668 /* PhotoCropEditorLib */ = {
+			isa = PBXGroup;
+			children = (
+				C951CA351F67E78200CB5668 /* CropRectView.swift */,
+				C951CA361F67E78200CB5668 /* CropView.swift */,
+				C951CA381F67E78200CB5668 /* CropViewController.swift */,
+				C951CA371F67E78200CB5668 /* CropViewController.h */,
+				C951CA3C1F67E78200CB5668 /* ResizeControl.swift */,
+				C951CA3D1F67E78200CB5668 /* UIImage+Crop.swift */,
+			);
+			name = PhotoCropEditorLib;
+			sourceTree = "<group>";
+		};
+
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -196,6 +247,9 @@
 				C978B4B51F61221300441680 /* expand.png in Resources */,
 				05979C991BC1872D00F5EA5F /* Assets.xcassets in Resources */,
 				33437F9E1F664A980031A16A /* crop_icon.png in Resources */,
+				C951CA421F67E78200CB5668 /* PhotoCropEditorBorder@2x.png in Resources */,
+				C951CA411F67E78200CB5668 /* PhotoCropEditorBorder.png in Resources */,
+				C951CA431F67E78200CB5668 /* PhotoCropEditorBorder@3x.png in Resources */,
 				05979C971BC1872D00F5EA5F /* Main.storyboard in Resources */,
 				33437FA21F66544A0031A16A /* move_icon.png in Resources */,
 			);
@@ -209,9 +263,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				05979CA61BC19BC700F5EA5F /* DetailTableViewController.swift in Sources */,
+				C951CA441F67E78200CB5668 /* ResizeControl.swift in Sources */,
 				05979CA41BC1898C00F5EA5F /* MainTableViewController.swift in Sources */,
+				C951CA3F1F67E78200CB5668 /* CropView.swift in Sources */,
 				33437FA61F6685BB0031A16A /* CustomImage.swift in Sources */,
+				C951CA3E1F67E78200CB5668 /* CropRectView.swift in Sources */,
 				05979C921BC1872D00F5EA5F /* AppDelegate.swift in Sources */,
+				C951CA401F67E78200CB5668 /* CropViewController.swift in Sources */,
+				C951CA451F67E78200CB5668 /* UIImage+Crop.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -326,6 +385,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEVELOPMENT_TEAM = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Memobird\\ Note\\ demo/CropViewController",
+					"$(PROJECT_DIR)/Memobird\\ Note\\ demo",
+				);
 				INFOPLIST_FILE = "Memobird Note demo/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -343,6 +407,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEVELOPMENT_TEAM = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Memobird\\ Note\\ demo/CropViewController",
+					"$(PROJECT_DIR)/Memobird\\ Note\\ demo",
+				);
 				INFOPLIST_FILE = "Memobird Note demo/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 9.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

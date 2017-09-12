@@ -7,16 +7,17 @@
 //
 
 import UIKit
+import PhotoCropEditor
 import Photos
 import AssetsLibrary
-
 let textFieldDefaultTag = 10
 let imageViewDefaultTag = 20
 let imageOptionsViewDefaultTag = 30
 let longPressButtonDefaultTag = 40
 let imageDescriptionDefaultTag = 50
 
-class DetailTableViewController: UITableViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate {
+
+class DetailTableViewController: UITableViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate,CropViewControllerDelegate {
 
     var index:Int?
     var subModelArray:[Any]!
@@ -236,11 +237,12 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             myTextField.delegate = self
             myTextField.font = .systemFont(ofSize: 18)
             myTextField.text = subModelArray[indexPath.row] as? String
-            myTextField.frame = CGRect(x: 0, y: 0, width: tableView.frame.size.width-30, height:cell.contentView.frame.size.height)
+            myTextField.frame = CGRect(x: 0, y: 0, width: tableView.frame.size.width-10, height:cell.contentView.frame.size.height)
             myTextField.addTarget(self, action: #selector(textFieldDidChange(textField:)), for: .editingChanged)
             myTextField.autocorrectionType = .no
             myTextField.isHidden = false
-            
+            self.setInitialFocus()
+
             let longPressButton : UIButton! = cell.contentView.viewWithTag(longPressButtonDefaultTag) as! UIButton!
             longPressButton.isHidden = true
             
@@ -436,6 +438,8 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     }
  
     func textField(_ textField: UITextField, shouldChangeCharactersIn range: NSRange, replacementString string: String) -> Bool {
+        let combinedString = textField.attributedText!.mutableCopy() as! NSMutableAttributedString
+        combinedString.replaceCharacters(in: range, with: string)
         
         if(textField.tag != imageDescriptionDefaultTag)
         {
@@ -458,24 +462,23 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             }
             print("Backspace pressed")
         }
+            if(combinedString.size().width < textField.bounds.size.width)
+            {
+                
+            }else
+            {
+                let currentCell : UITableViewCell! = textField.superview?.superview as! UITableViewCell
+                let currentIndexpath : NSIndexPath! = tableView.indexPath(for: currentCell)! as NSIndexPath
+                selectedRowIndex = currentIndexpath!.row
+                
+                createNewCell(tag: (currentIndexpath!.row))
+                
+            }
+
         }
-        let currentCharacterCount = textField.text?.characters.count ?? 0
-        if (range.length + range.location > currentCharacterCount){
-            return false
-        }
-        let newLength = currentCharacterCount + string.characters.count - range.length
-        if(newLength <= 36)
-        {
-            
-        }else
-        {
-            let currentCell : UITableViewCell! = textField.superview?.superview as! UITableViewCell
-            let currentIndexpath : NSIndexPath! = tableView.indexPath(for: currentCell)! as NSIndexPath
-            selectedRowIndex = currentIndexpath!.row
-            
-            createNewCell(tag: (currentIndexpath!.row))
-        }
-        return newLength <= 36
+        
+        
+        return combinedString.size().width < textField.bounds.size.width
     }
 
     @IBAction func photo_discription_btn(_ sender: UIButton)
@@ -486,10 +489,27 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
          var myphotoedittextfiled : UITextField! = currentCell.contentView.viewWithTag(imageDescriptionDefaultTag) as! UITextField!
         myphotoedittextfiled.isHidden = false
         myImageOptionsView.isHidden = true
+        self.setInitialFocuspicturedescription()
     }
     // MARK: - Custom methods
     
- 
+    var cropimageindex = 0
+    @IBAction func crop_btn(_ sender: UIButton)
+    {
+         let controller = CropViewController()
+         controller.delegate = self
+        let currentCell : UITableViewCell! = sender.superview?.superview?.superview as! UITableViewCell
+        let currentIndexpath : NSIndexPath! = tableView.indexPath(for: currentCell)! as NSIndexPath
+        cropimageindex = currentIndexpath.row
+        let customImageObj = subModelArray[currentIndexpath.row] as? customImage
+       // let imageName = "cropimg.jpg"
+       // let image = UIImage(named: imageName)
+         controller.image = customImageObj?.image
+         
+         let navController = UINavigationController(rootViewController: controller)
+         present(navController, animated: true, completion: nil)
+        
+    }
 // Delete image action
     @IBAction func delete_image_clicked(_ sender : UIButton)
     {
@@ -569,15 +589,57 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
 
         
     }
-    
+    func setInitialFocuspicturedescription()
+    {
+        
+        let indexPaths  = indexPathsForRowsInSection(0, numberOfRows: tableView.numberOfRows(inSection: 0))
+        let cell =  self.tableView.cellForRow(at: (indexPaths[subModelArray.count-1]) as IndexPath)
+        if((cell?.contentView.viewWithTag(imageDescriptionDefaultTag)) != nil)
+        {
+            cell?.setSelected(true, animated:true)
+            let currentTextField : UITextField! = cell!.contentView.viewWithTag(imageDescriptionDefaultTag) as! UITextField
+            currentTextField.delegate = self
+            currentTextField.becomeFirstResponder()
+        }
+        
+        
+    }
+
     // Getting indexPaths for all rows
     func indexPathsForRowsInSection(_ section: Int, numberOfRows: Int) -> [NSIndexPath] {
         return (0..<numberOfRows).map{NSIndexPath(row: $0, section: section)}
     }
 
+
+
+// MARK: - CropView
+func cropViewController(_ controller: CropViewController, didFinishCroppingImage image: UIImage) {
+    //        controller.dismissViewControllerAnimated(true, completion: nil)
+    //        imageView.image = image
+    //        updateEditButtonEnabled()
 }
 
+func cropViewController(_ controller: CropViewController, didFinishCroppingImage image: UIImage, transform: CGAffineTransform, cropRect: CGRect){
+    
+    
+    let customImageObj = subModelArray[cropimageindex] as? customImage
+    let imageDesc = customImageObj?.imageDescription
+    // let imageName = "cropimg.jpg"
+    // let image = UIImage(named: imageName)
+    customImageObj?.image = image
+    customImageObj?.imageDescription = imageDesc!
+    subModelArray[cropimageindex] = customImageObj!
+    controller.dismiss(animated: true, completion: nil)
+    tableView .reloadData()
+   }
 
+func cropViewControllerDidCancel(_ controller: CropViewController) {
+    controller.dismiss(animated: true, completion: nil)
+}
+
+// MARK: - UIImagePickerController delegate methods
+
+}
 
 extension UITextField {
     func setCursor(position: Int) {
