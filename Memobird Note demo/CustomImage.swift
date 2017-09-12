@@ -2,8 +2,8 @@
 //  CustomImage.swift
 //  Memobird Note Demo
 //
-//  Created by Oottru Technologies on 11/09/17.
-//  Copyright © 2017 Apoorv Mote. All rights reserved.
+//  Created by Kumaravel on 11/09/17.
+//  Copyright © 2017 Oottru Technologies. All rights reserved.
 //
 
 import UIKit

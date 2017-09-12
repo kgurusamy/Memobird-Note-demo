@@ -72,10 +72,10 @@
 		05979C901BC1872D00F5EA5F /* Memobird Note Demo */ = {
 			isa = PBXGroup;
 			children = (
+				33F8EAF91F678C240083FB72 /* Model */,
 				336BE1A11F62D1A200E69083 /* images */,
 				336BE1A01F62D16100E69083 /* storyboard views */,
 				05979C981BC1872D00F5EA5F /* Assets.xcassets */,
-				33437FA51F6685BB0031A16A /* CustomImage.swift */,
 				336BE19F1F62D14900E69083 /* viewControllers */,
 				05979C911BC1872D00F5EA5F /* AppDelegate.swift */,
 				05979C9D1BC1872D00F5EA5F /* Info.plist */,
@@ -120,6 +120,14 @@
 				C978B4B41F61221300441680 /* expand.png */,
 			);
 			name = images;
+			sourceTree = "<group>";
+		};
+		33F8EAF91F678C240083FB72 /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				33437FA51F6685BB0031A16A /* CustomImage.swift */,
+			);
+			name = Model;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
