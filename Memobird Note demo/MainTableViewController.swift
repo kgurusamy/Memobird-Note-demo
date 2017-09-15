@@ -53,26 +53,9 @@ class MainTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "tableCell", for: indexPath)
         cell.clipsToBounds = true
         // Configure the cell...
-        let submodel = notes[indexPath.row].subNote as? [Any]
         
-         let myNoteNameLabel : UILabel! = cell.contentView.viewWithTag(noteLabelDefaultTag) as! UILabel!
-        if let submodel = submodel {
-        // Setting a first string as a title for the Row
-        for i in 0 ..< submodel.count {
-            if submodel[i] is String {
-                let localString = submodel[i] as? String
-                if((localString?.characters.count)! > 0 && localString != " ")
-                {
-                    myNoteNameLabel.text = submodel[i] as? String
-                    break
-                }
-            }
-        }
-        }
-        else{
-            
-            myNoteNameLabel.text = ""
-        }
+        let myNoteNameLabel : UILabel! = cell.contentView.viewWithTag(noteLabelDefaultTag) as! UILabel!
+        myNoteNameLabel.text = notes[indexPath.row].name
         
         let myDateLabel : UILabel! = cell.contentView.viewWithTag(dateLabelDefaultTag) as! UILabel!
         
