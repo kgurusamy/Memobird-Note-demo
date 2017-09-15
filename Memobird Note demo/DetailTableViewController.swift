@@ -30,13 +30,6 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         super.viewDidLoad()
         
         imagePicker.delegate = self
-        
-//Drag and drop long press gesture on tableview cell
-        
-//        let longpress = UILongPressGestureRecognizer(target: self, action: #selector(DetailTableViewController.longPressGestureRecognized(_:)))
-//        tableView.addGestureRecognizer(longpress)
-        
-        
         tableView.rowHeight = UITableViewAutomaticDimension
         print("subModelArrayCount : \(subModelArray?.count ?? 0)")
 
@@ -184,14 +177,11 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         let myImageOptionsView : UIView! = currentCell.contentView.viewWithTag(imageOptionsViewDefaultTag) as UIView!
         
         if(myImageOptionsView.isHidden == false){
-            
             myImageOptionsView.isHidden = true
         }
-        else
-        {
+        else{
             myImageOptionsView.isHidden = false
         }
-        
         print("Imageview tapped on \(currentIndexpath!.row)")
                 
     }
@@ -200,18 +190,14 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         
-        if ((subModelArray?[indexPath.row] as? customImage) != nil)
-        {
-            if(viewHasMoved == true)
-            {
+        if ((subModelArray?[indexPath.row] as? customImage) != nil){
+            if(viewHasMoved == true){
                 return 40
             }
-            else
-            {
+            else{
                 return 240
             }
         }
-        
         return 40
         //Not expanded
     }
@@ -231,8 +217,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         if (subModelArray?.count != nil) {
             return (subModelArray?.count)!
         }
-        else
-        {
+        else{
             return 0
         }
     }
@@ -245,13 +230,10 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath as IndexPath)
         
-          if subModelArray?[indexPath.row] is String
-        {
-
+          if subModelArray?[indexPath.row] is String{
             let myTextField : UITextField! = cell.contentView.viewWithTag(textFieldDefaultTag) as! UITextField!
             let myImageView : UIImageView! = cell.contentView.viewWithTag(imageViewDefaultTag) as! UIImageView!
             myImageView.image = nil
-            
             myTextField.delegate = self
             myTextField.font = .systemFont(ofSize: 18)
             myTextField.text = subModelArray?[indexPath.row] as? String
@@ -273,27 +255,22 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         }
         else
         {
-            if(viewHasMoved == true)
-            {
+            if(viewHasMoved == true){
                 let myMovingCell = tableView.cellForRow(at: movingCellIndexPath! as IndexPath)
-                if movingCellIndexPath != nil
-                {
+                if movingCellIndexPath != nil{
                     myMovingCell?.isHidden = true
                 }
-                else
-                {
+                else{
                     myMovingCell?.isHidden = false
                 }
             }
             let myTextField : UITextField! = cell.contentView.viewWithTag(textFieldDefaultTag) as! UITextField!
             myTextField.isHidden = true
             
-            
             let myImageView : UIImageView! = cell.contentView.viewWithTag(imageViewDefaultTag) as! UIImageView!
             myImageView.frame = CGRect(x : 30, y: 5, width : tableView.frame.size.width-60, height:200)
             myImageView.contentMode = UIViewContentMode.scaleAspectFit
-
-           
+    
             let longPressButton : UIButton! = cell.contentView.viewWithTag(longPressButtonDefaultTag) as! UIButton!
             longPressButton.frame = CGRect(x: myImageView.frame.origin.x+myImageView.frame.size.width-10,y: myImageView.frame.origin.y+10,width:28,height:28)
             longPressButton.isHidden = false
@@ -317,21 +294,14 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             imageDescription.delegate = self
             imageDescription.font = .systemFont(ofSize: 12)
             imageDescription.placeholder = "Picture Description"
-            //imageDescription.text = subModelArray[indexPath.row] as? String
-           // imageDescription.addTarget(self, action: #selector(phototextFieldDidChange(textField:)), for: .editingChanged)
             imageDescription.autocorrectionType = .no
-        
             let imgDescCharactersCount = (customImageObj?.imageDescription.characters.count)
-            if(imgDescCharactersCount != nil && imgDescCharactersCount! > 0)
-            {
+            if(imgDescCharactersCount != nil && imgDescCharactersCount! > 0){
             imageDescription.text = customImageObj?.imageDescription
             imageDescription.isHidden = false
             }else{
                 imageDescription.isHidden = true
-
             }
-            //myphotoedittextfiled.isHidden = false
-
         }
         cell.selectionStyle = .none
         // Configure the cell...
@@ -365,14 +335,12 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     
     func openCamera()
     {
-        if(UIImagePickerController .isSourceTypeAvailable(UIImagePickerControllerSourceType.camera))
-        {
+        if(UIImagePickerController .isSourceTypeAvailable(UIImagePickerControllerSourceType.camera)){
             imagePicker.sourceType = UIImagePickerControllerSourceType.camera
             imagePicker.allowsEditing = true
             self.present(imagePicker, animated: true, completion: nil)
         }
-        else
-        {
+        else{
             let alert  = UIAlertController(title: "Warning", message: "You don't have camera", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
             self.present(alert, animated: true, completion: nil)
@@ -411,23 +379,15 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
                 let myImageView : UIImageView? = cell?.contentView.viewWithTag(imageViewDefaultTag) as? UIImageView
             let imageDescription : UITextField? = cell?.contentView.viewWithTag(imageDescriptionDefaultTag) as? UITextField
                
-                if(myImageView?.image != nil)
-                {
+                if(myImageView?.image != nil){
                     let myCustomImage = customImage(image: (myImageView?.image)!, imageDescription: (imageDescription?.text)!)
                     subModelArray?.append(myCustomImage as Any)
-                    
-                    //subModelArray.append(myImageView?.image! as Any)
-                
                 }
-                else
-                {
+                else{
                     subModelArray?.append(myTextField?.text ?? "")
                 }
             }
- 
         }
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
     }
     
     // MARK: - TextField Methods
@@ -596,7 +556,6 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     //Initial Textfield focus point
     func setInitialFocus()
     {
-        
         let indexPaths  = indexPathsForRowsInSection(0, numberOfRows: tableView.numberOfRows(inSection: 0))
         let cell =  self.tableView.cellForRow(at: (indexPaths[(subModelArray?.count)!-1]) as IndexPath)
         if((cell?.contentView.viewWithTag(textFieldDefaultTag)) != nil)
@@ -606,8 +565,6 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             currentTextField.delegate = self
             currentTextField.becomeFirstResponder()
         }
-
-        
     }
     func setInitialFocuspicturedescription()
     {
@@ -621,31 +578,20 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             currentTextField.delegate = self
             currentTextField.becomeFirstResponder()
         }
-        
-        
     }
 
     // Getting indexPaths for all rows
     func indexPathsForRowsInSection(_ section: Int, numberOfRows: Int) -> [NSIndexPath] {
         return (0..<numberOfRows).map{NSIndexPath(row: $0, section: section)}
     }
-
-
-
 // MARK: - CropView
 func cropViewController(_ controller: CropViewController, didFinishCroppingImage image: UIImage) {
-    //        controller.dismissViewControllerAnimated(true, completion: nil)
-    //        imageView.image = image
-    //        updateEditButtonEnabled()
 }
 
 func cropViewController(_ controller: CropViewController, didFinishCroppingImage image: UIImage, transform: CGAffineTransform, cropRect: CGRect){
     
-    
     let customImageObj = subModelArray?[cropimageindex] as? customImage
     let imageDesc = customImageObj?.imageDescription
-    // let imageName = "cropimg.jpg"
-    // let image = UIImage(named: imageName)
     customImageObj?.image = image
     customImageObj?.imageDescription = imageDesc!
     subModelArray?[cropimageindex] = customImageObj!

@@ -13,22 +13,39 @@ import CoreData
 let dateLabelDefaultTag = 10
 let noteLabelDefaultTag = 20
 
-class MainTableViewController: UITableViewController {
+class MainTableViewController: UITableViewController,UISearchResultsUpdating  {
     
     var notes = [Notes]()
-  
+    let searchController = UISearchController(searchResultsController: nil)
+    var filteredNotes = [Notes]()
+
 //  MARK: - VIEWCONTROLLER DELEGATE methods
     override func viewDidLoad() {
         super.viewDidLoad()
     
         getSavedData()
-        
-        // Retrieving from local storage
-//        if(UserDefaults.standard.object(forKey: "notes") != nil){
-//            let decoded  = UserDefaults.standard.object(forKey: "notes") as! Data
-//            notes = NSKeyedUnarchiver.unarchiveObject( with: decoded as Data!) as! [[Any]]
-//        }
+        searchController.searchResultsUpdater = self
+        searchController.dimsBackgroundDuringPresentation = false
+        definesPresentationContext = true
+        tableView.tableHeaderView = searchController.searchBar
+        self.tableView.separatorStyle = UITableViewCellSeparatorStyle.none
+        self.searchController.hidesNavigationBarDuringPresentation = false
+
+
     }
+    func updateSearchResults(for searchController: UISearchController) {
+        // If we haven't typed anything into the search bar then do not filter the results
+        if searchController.searchBar.text! == "" {
+            filteredNotes = notes
+        } else {
+            // Filter the results
+            filteredNotes = notes.filter { ($0.name?.lowercased().contains(searchController.searchBar.text!.lowercased()))! }
+        }
+        
+        self.tableView.reloadData()
+    }
+    
+
        override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -43,7 +60,12 @@ class MainTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return notes.count
+        if (searchController.searchBar.text! == ""){
+           return notes.count
+            
+        }else{
+           return self.filteredNotes.count
+        }
     }
 
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -52,19 +74,31 @@ class MainTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "tableCell", for: indexPath)
         cell.clipsToBounds = true
+        
         // Configure the cell...
         
         let myNoteNameLabel : UILabel! = cell.contentView.viewWithTag(noteLabelDefaultTag) as! UILabel!
-        myNoteNameLabel.text = notes[indexPath.row].name
-        
-        let myDateLabel : UILabel! = cell.contentView.viewWithTag(dateLabelDefaultTag) as! UILabel!
-        
-        let formatter = DateFormatter()
-        formatter.dateFormat = "dd-MM-yyyy hh:mm a"
-        let modifiedDateTime = notes[indexPath.row].modified_time
-        
-        myDateLabel.text = formatter.string(from: modifiedDateTime! as Date)
-        
+        if (searchController.searchBar.text! == ""){
+            myNoteNameLabel.text = notes[indexPath.row].name
+            let myDateLabel : UILabel! = cell.contentView.viewWithTag(dateLabelDefaultTag) as! UILabel!
+            
+            let formatter = DateFormatter()
+            formatter.dateFormat = "dd-MM-yyyy hh:mm a"
+            let modifiedDateTime = notes[indexPath.row].modified_time
+            
+            myDateLabel.text = formatter.string(from: modifiedDateTime! as Date)
+
+        }else{
+            myNoteNameLabel.text = self.filteredNotes[indexPath.row].name
+            let myDateLabel : UILabel! = cell.contentView.viewWithTag(dateLabelDefaultTag) as! UILabel!
+            
+            let formatter = DateFormatter()
+            formatter.dateFormat = "dd-MM-yyyy hh:mm a"
+            let modifiedDateTime = filteredNotes[indexPath.row].modified_time
+            
+            myDateLabel.text = formatter.string(from: modifiedDateTime! as Date)
+
+        }
         return cell
     }
     
@@ -121,12 +155,6 @@ class MainTableViewController: UITableViewController {
         }
         
         CoreDataStack.saveContext()
-        
-// Saving to local storage
-//        let defaults = UserDefaults.standard
-//        let encodedData = NSKeyedArchiver.archivedData(withRootObject: notes)
-//        defaults.set(encodedData, forKey: "notes")
-//        defaults.synchronize()
         tableView.reloadData()
     }
 
@@ -142,8 +170,6 @@ class MainTableViewController: UITableViewController {
             
             detailViewController.subModelArray = notes[(path?.row)!].subNote as? [Any]
         }
-        // Get the new view controller using [segue destinationViewController].
-        // Pass the selected object to the new view controller.
     }
     
     //  MARK: - CoreData ADD & SAVE methods
