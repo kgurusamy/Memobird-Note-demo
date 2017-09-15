@@ -7,20 +7,27 @@
 //
 
 import UIKit
+import Foundation
+import CoreData
+
+let dateLabelDefaultTag = 10
+let noteLabelDefaultTag = 20
 
 class MainTableViewController: UITableViewController {
     
-    var notes = [[Any]]()
+    var notes = [Notes]()
   
 //  MARK: - VIEWCONTROLLER DELEGATE methods
     override func viewDidLoad() {
         super.viewDidLoad()
+    
+        getSavedData()
         
         // Retrieving from local storage
-        if(UserDefaults.standard.object(forKey: "notes") != nil){
-            let decoded  = UserDefaults.standard.object(forKey: "notes") as! Data
-            notes = NSKeyedUnarchiver.unarchiveObject( with: decoded as Data!) as! [[Any]]
-        }
+//        if(UserDefaults.standard.object(forKey: "notes") != nil){
+//            let decoded  = UserDefaults.standard.object(forKey: "notes") as! Data
+//            notes = NSKeyedUnarchiver.unarchiveObject( with: decoded as Data!) as! [[Any]]
+//        }
     }
        override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -44,19 +51,37 @@ class MainTableViewController: UITableViewController {
     }
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "tableCell", for: indexPath)
+        cell.clipsToBounds = true
         // Configure the cell...
-        var submodel = notes[indexPath.row]
+        let submodel = notes[indexPath.row].subNote as? [Any]
+        
+         let myNoteNameLabel : UILabel! = cell.contentView.viewWithTag(noteLabelDefaultTag) as! UILabel!
+        if let submodel = submodel {
         // Setting a first string as a title for the Row
         for i in 0 ..< submodel.count {
             if submodel[i] is String {
                 let localString = submodel[i] as? String
                 if((localString?.characters.count)! > 0 && localString != " ")
                 {
-                    cell.textLabel?.text = submodel[i] as? String
+                    myNoteNameLabel.text = submodel[i] as? String
                     break
                 }
             }
         }
+        }
+        else{
+            
+            myNoteNameLabel.text = ""
+        }
+        
+        let myDateLabel : UILabel! = cell.contentView.viewWithTag(dateLabelDefaultTag) as! UILabel!
+        
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd-MM-yyyy hh:mm a"
+        let modifiedDateTime = notes[indexPath.row].modified_time
+        
+        myDateLabel.text = formatter.string(from: modifiedDateTime! as Date)
+        
         return cell
     }
     
@@ -64,12 +89,20 @@ class MainTableViewController: UITableViewController {
     // Add newnote button click
     @IBAction func Addnotebtn(_ sender: Any)
     {
-        let subModel1 = [" "]
-        notes.append(subModel1)
-        tableView .reloadData()
-        let indexPath = IndexPath(row: notes.count-1, section: 0)
-        tableView.selectRow(at: indexPath, animated: true, scrollPosition: .top)
-        self.performSegue(withIdentifier: "edit", sender: self)
+       
+        InitialNoteSave()
+        getSavedData()
+        
+        UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 1,initialSpringVelocity: 1, options:[], animations: {
+            
+            self.tableView .reloadData()
+            
+        }, completion: { (finished: Bool) in
+            
+            let indexPath = IndexPath(row: self.notes.count-1, section: 0)
+            self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .top)
+            self.performSegue(withIdentifier: "edit", sender: self)
+        })
         
     }
     // Save button click
@@ -78,12 +111,39 @@ class MainTableViewController: UITableViewController {
         let detailViewController = segue.source as! DetailTableViewController
         let index = detailViewController.index
         let subModel = detailViewController.subModelArray
-        notes[index!] = subModel!
-        // Saving to local storage
-        let defaults = UserDefaults.standard
-        let encodedData = NSKeyedArchiver.archivedData(withRootObject: notes)
-        defaults.set(encodedData, forKey: "notes")
-        defaults.synchronize()
+        
+        let fetchRequest: NSFetchRequest<Notes> = Notes.fetchRequest()
+     
+        do {
+            let records = try CoreDataStack.managedObjectContext.fetch(fetchRequest)
+            let saveNote : Notes  = records[index!]
+        
+        saveNote.subNote = subModel! as NSObject
+            
+        saveNote.modified_time = Date() as NSDate
+    
+        for i in 0..<subModel!.count {
+            if subModel?[i] is String {
+                let localString = subModel?[i] as? String
+                if((localString?.characters.count)! > 0 && localString != " ")
+                {
+                    saveNote.name = subModel![i] as? String
+                    break
+                }
+            }
+        }
+
+        } catch {
+            print(error)
+        }
+        
+        CoreDataStack.saveContext()
+        
+// Saving to local storage
+//        let defaults = UserDefaults.standard
+//        let encodedData = NSKeyedArchiver.archivedData(withRootObject: notes)
+//        defaults.set(encodedData, forKey: "notes")
+//        defaults.synchronize()
         tableView.reloadData()
     }
 
@@ -96,10 +156,52 @@ class MainTableViewController: UITableViewController {
             let path = tableView.indexPathForSelectedRow
             let detailViewController = segue.destination as! DetailTableViewController
             detailViewController.index = path?.row
-            detailViewController.subModelArray = notes[(path?.row)!]
+            
+            detailViewController.subModelArray = notes[(path?.row)!].subNote as? [Any]
         }
         // Get the new view controller using [segue destinationViewController].
         // Pass the selected object to the new view controller.
     }
+    
+    //  MARK: - CoreData ADD & SAVE methods
+   
+    func InitialNoteSave() {
+        if #available(iOS 10.0, *) {
+            let coreDataNote = Notes(context: CoreDataStack.managedObjectContext)
+          
+            coreDataNote.name = " "
+            coreDataNote.modified_time = Date() as NSDate
+            coreDataNote.subNote = nil
+            
+        } else {
+            // Fallback on earlier versions
+            
+            let entityDesc = NSEntityDescription.entity(forEntityName: "Notes", in: CoreDataStack.managedObjectContext)
+            let coreDataNote = Notes(entity: entityDesc!, insertInto: CoreDataStack.managedObjectContext)
+            coreDataNote.name = " "
+            coreDataNote.modified_time = Date() as NSDate
+            coreDataNote.subNote = nil
+        }
+        CoreDataStack.saveContext()
+    }
 
+    func getSavedData()
+    {
+        
+        let fetchRequest: NSFetchRequest<Notes> = Notes.fetchRequest()
+        
+        do {
+
+            notes = try CoreDataStack.managedObjectContext.fetch(fetchRequest)
+            
+            for record in notes {
+                
+                print("Note name : \(record.name ?? " ")")
+                print("Date created :\(String(describing: record.modified_time ?? nil))")
+            }
+            
+        } catch {
+            print(error)
+        }
+    }
 }

@@ -20,7 +20,7 @@ let imageDescriptionDefaultTag = 50
 class DetailTableViewController: UITableViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate,CropViewControllerDelegate {
 
     var index:Int?
-    var subModelArray:[Any]!
+    var subModelArray:[Any]?
     let imagePicker = UIImagePickerController()
     var selectedRowIndex = 0
     var viewHasMoved = false
@@ -35,9 +35,22 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         
 //        let longpress = UILongPressGestureRecognizer(target: self, action: #selector(DetailTableViewController.longPressGestureRecognized(_:)))
 //        tableView.addGestureRecognizer(longpress)
+        
+        
         tableView.rowHeight = UITableViewAutomaticDimension
-        print("subModelArrayCount : \(subModelArray.count)")
+        print("subModelArrayCount : \(subModelArray?.count ?? 0)")
 
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if(subModelArray == nil){
+            subModelArray = []
+            let emptyString :String = " "
+            subModelArray?.append(emptyString)
+        }
+        
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -105,7 +118,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
                 My.cellSnapshot?.frame = CGRect(x:(My.cellSnapshot?.frame.origin.x)!, y:(My.cellSnapshot?.frame.origin.y)!,width:(My.cellSnapshot?.frame.size.width)!, height : 40)
                 My.cellSnapshot!.center = center
                 if ((indexPath != nil) && (indexPath != Path.initialIndexPath)) {
-                    subModelArray.insert(subModelArray.remove(at: Path.initialIndexPath!.row), at: indexPath!.row)
+                    subModelArray?.insert(subModelArray?.remove(at: Path.initialIndexPath!.row) ?? "", at: indexPath!.row)
                     tableView.moveRow(at: Path.initialIndexPath!, to: indexPath!)
                     Path.initialIndexPath = indexPath
                 }
@@ -141,7 +154,6 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
                 tableView.reloadData()
             }
         }
-        
     }
     
     func snapshotOfCell(_ inputView: UIView) -> UIView {
@@ -188,7 +200,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         
-        if ((subModelArray[indexPath.row] as? customImage) != nil)
+        if ((subModelArray?[indexPath.row] as? customImage) != nil)
         {
             if(viewHasMoved == true)
             {
@@ -216,7 +228,13 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return subModelArray.count
+        if (subModelArray?.count != nil) {
+            return (subModelArray?.count)!
+        }
+        else
+        {
+            return 0
+        }
     }
 
     override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -227,7 +245,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath as IndexPath)
         
-          if subModelArray[indexPath.row] is String
+          if subModelArray?[indexPath.row] is String
         {
 
             let myTextField : UITextField! = cell.contentView.viewWithTag(textFieldDefaultTag) as! UITextField!
@@ -236,7 +254,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             
             myTextField.delegate = self
             myTextField.font = .systemFont(ofSize: 18)
-            myTextField.text = subModelArray[indexPath.row] as? String
+            myTextField.text = subModelArray?[indexPath.row] as? String
             myTextField.frame = CGRect(x: 0, y: 0, width: tableView.frame.size.width-10, height:cell.contentView.frame.size.height)
             myTextField.addTarget(self, action: #selector(textFieldDidChange(textField:)), for: .editingChanged)
             myTextField.autocorrectionType = .no
@@ -288,7 +306,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             let tapImageView = UITapGestureRecognizer(target: self, action: #selector(self.tapGestureForImageView(_:)))
             myImageView.addGestureRecognizer(tapImageView)
             
-            let customImageObj = subModelArray[indexPath.row] as? customImage
+            let customImageObj = subModelArray?[indexPath.row] as? customImage
             myImageView.image = customImageObj?.image
             print("Image description : \(customImageObj?.imageDescription ?? "")")
              let imageDescription : UITextField! = cell.contentView.viewWithTag(imageDescriptionDefaultTag) as? UITextField
@@ -302,7 +320,9 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             //imageDescription.text = subModelArray[indexPath.row] as? String
            // imageDescription.addTarget(self, action: #selector(phototextFieldDidChange(textField:)), for: .editingChanged)
             imageDescription.autocorrectionType = .no
-            if((customImageObj?.imageDescription.characters.count)! > 0)
+        
+            let imgDescCharactersCount = (customImageObj?.imageDescription.characters.count)
+            if(imgDescCharactersCount != nil && imgDescCharactersCount! > 0)
             {
             imageDescription.text = customImageObj?.imageDescription
             imageDescription.isHidden = false
@@ -371,7 +391,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         
         if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
             let customImageObj = customImage(image:image, imageDescription:"")
-            subModelArray.insert(customImageObj, at: selectedRowIndex+1)
+            subModelArray?.insert(customImageObj, at: selectedRowIndex+1)
             //subModelArray.insert(image, at: selectedRowIndex+1)
             
             tableView.reloadData()
@@ -383,7 +403,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "save" {
             let indexPaths  = indexPathsForRowsInSection(0, numberOfRows: tableView.numberOfRows(inSection: 0))
-            subModelArray.removeAll()
+            subModelArray?.removeAll()
             for i in 0 ..< indexPaths.count
             {
                 let cell = tableView.cellForRow(at: (indexPaths[i]) as IndexPath)
@@ -394,14 +414,14 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
                 if(myImageView?.image != nil)
                 {
                     let myCustomImage = customImage(image: (myImageView?.image)!, imageDescription: (imageDescription?.text)!)
-                    subModelArray.append(myCustomImage as Any)
+                    subModelArray?.append(myCustomImage as Any)
                     
                     //subModelArray.append(myImageView?.image! as Any)
                 
                 }
                 else
                 {
-                    subModelArray.append(myTextField?.text ?? "")
+                    subModelArray?.append(myTextField?.text ?? "")
                 }
             }
  
@@ -421,7 +441,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             let currentCell : UITableViewCell! = textField.superview?.superview as! UITableViewCell
             let currentIndexpath : NSIndexPath! = tableView.indexPath(for: currentCell)! as NSIndexPath
             selectedRowIndex = currentIndexpath!.row
-            subModelArray[currentIndexpath!.row] = textField.text!
+            subModelArray?[currentIndexpath!.row] = textField.text!
         }
     }
     
@@ -501,7 +521,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         let currentCell : UITableViewCell! = sender.superview?.superview?.superview as! UITableViewCell
         let currentIndexpath : NSIndexPath! = tableView.indexPath(for: currentCell)! as NSIndexPath
         cropimageindex = currentIndexpath.row
-        let customImageObj = subModelArray[currentIndexpath.row] as? customImage
+        let customImageObj = subModelArray?[currentIndexpath.row] as? customImage
        // let imageName = "cropimg.jpg"
        // let image = UIImage(named: imageName)
          controller.image = customImageObj?.image
@@ -523,8 +543,8 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
  //Deleting string backspace
     func deleteCell(tag : Int)
     {
-        if(subModelArray.count>1){
-            subModelArray.remove(at: tag)
+        if((subModelArray?.count)!>1){
+            subModelArray?.remove(at: tag)
             UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 1,initialSpringVelocity: 1, options:[], animations: {
             self.tableView.reloadData()
                  }, completion: { (finished: Bool) in
@@ -559,7 +579,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     func createNewCell(tag : Int)
     {
         let emptyRow : String = " "
-        subModelArray.insert(emptyRow, at: tag+1)
+        subModelArray?.insert(emptyRow, at: tag+1)
         UIView.animate(withDuration: 0.1, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options:[], animations: {
              self.tableView.reloadData()
         }, completion: { (finished: Bool) in
@@ -578,7 +598,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     {
         
         let indexPaths  = indexPathsForRowsInSection(0, numberOfRows: tableView.numberOfRows(inSection: 0))
-        let cell =  self.tableView.cellForRow(at: (indexPaths[subModelArray.count-1]) as IndexPath)
+        let cell =  self.tableView.cellForRow(at: (indexPaths[(subModelArray?.count)!-1]) as IndexPath)
         if((cell?.contentView.viewWithTag(textFieldDefaultTag)) != nil)
         {
             cell?.setSelected(true, animated:true)
@@ -593,7 +613,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     {
         
         let indexPaths  = indexPathsForRowsInSection(0, numberOfRows: tableView.numberOfRows(inSection: 0))
-        let cell =  self.tableView.cellForRow(at: (indexPaths[subModelArray.count-1]) as IndexPath)
+        let cell =  self.tableView.cellForRow(at: (indexPaths[(subModelArray?.count)!-1]) as IndexPath)
         if((cell?.contentView.viewWithTag(imageDescriptionDefaultTag)) != nil)
         {
             cell?.setSelected(true, animated:true)
@@ -622,13 +642,13 @@ func cropViewController(_ controller: CropViewController, didFinishCroppingImage
 func cropViewController(_ controller: CropViewController, didFinishCroppingImage image: UIImage, transform: CGAffineTransform, cropRect: CGRect){
     
     
-    let customImageObj = subModelArray[cropimageindex] as? customImage
+    let customImageObj = subModelArray?[cropimageindex] as? customImage
     let imageDesc = customImageObj?.imageDescription
     // let imageName = "cropimg.jpg"
     // let image = UIImage(named: imageName)
     customImageObj?.image = image
     customImageObj?.imageDescription = imageDesc!
-    subModelArray[cropimageindex] = customImageObj!
+    subModelArray?[cropimageindex] = customImageObj!
     controller.dismiss(animated: true, completion: nil)
     tableView .reloadData()
    }

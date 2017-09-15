@@ -19,6 +19,8 @@
 		33437FA01F664A980031A16A /* edit_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 33437F9D1F664A980031A16A /* edit_icon.png */; };
 		33437FA21F66544A0031A16A /* move_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 33437FA11F66544A0031A16A /* move_icon.png */; };
 		33437FA61F6685BB0031A16A /* CustomImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33437FA51F6685BB0031A16A /* CustomImage.swift */; };
+		3362E1371F6A3DA1008B1681 /* Notes.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3362E1351F6A3DA1008B1681 /* Notes.xcdatamodeld */; };
+		3362E1A31F6A5609008B1681 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3362E1A21F6A5609008B1681 /* CoreDataStack.swift */; };
 		33F8EB051F6803930083FB72 /* PhotoCropEditor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33F8EB031F6803650083FB72 /* PhotoCropEditor.framework */; };
 		33F8EB061F6803930083FB72 /* PhotoCropEditor.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 33F8EB031F6803650083FB72 /* PhotoCropEditor.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C951CA3E1F67E78200CB5668 /* CropRectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C951CA351F67E78200CB5668 /* CropRectView.swift */; };
@@ -61,6 +63,8 @@
 		33437F9D1F664A980031A16A /* edit_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = edit_icon.png; sourceTree = "<group>"; };
 		33437FA11F66544A0031A16A /* move_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = move_icon.png; sourceTree = "<group>"; };
 		33437FA51F6685BB0031A16A /* CustomImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomImage.swift; sourceTree = "<group>"; };
+		3362E1361F6A3DA1008B1681 /* Notes.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Notes.xcdatamodel; sourceTree = "<group>"; };
+		3362E1A21F6A5609008B1681 /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
 		33F8EB031F6803650083FB72 /* PhotoCropEditor.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PhotoCropEditor.framework; path = "Memobird Note demo/PhotoCropEditor.framework"; sourceTree = "<group>"; };
 		C951CA351F67E78200CB5668 /* CropRectView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CropRectView.swift; sourceTree = "<group>"; };
 		C951CA361F67E78200CB5668 /* CropView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CropView.swift; sourceTree = "<group>"; };
@@ -164,6 +168,7 @@
 			isa = PBXGroup;
 			children = (
 				33437FA51F6685BB0031A16A /* CustomImage.swift */,
+				3362E1A21F6A5609008B1681 /* CoreDataStack.swift */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -171,6 +176,7 @@
 		C951CA501F67FA7B00CB5668 /* Resource */ = {
 			isa = PBXGroup;
 			children = (
+				3362E1351F6A3DA1008B1681 /* Notes.xcdatamodeld */,
 				05979C981BC1872D00F5EA5F /* Assets.xcassets */,
 				05979C9D1BC1872D00F5EA5F /* Info.plist */,
 				336BE1A11F62D1A200E69083 /* images */,
@@ -219,7 +225,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastUpgradeCheck = 0700;
-				ORGANIZATIONNAME = "Apoorv Mote";
+				ORGANIZATIONNAME = "Oottru Technologies";
 				TargetAttributes = {
 					05979C8D1BC1872D00F5EA5F = {
 						CreatedOnToolsVersion = 7.0.1;
@@ -274,6 +280,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				05979CA61BC19BC700F5EA5F /* DetailTableViewController.swift in Sources */,
+				3362E1371F6A3DA1008B1681 /* Notes.xcdatamodeld in Sources */,
+				3362E1A31F6A5609008B1681 /* CoreDataStack.swift in Sources */,
 				C951CA441F67E78200CB5668 /* ResizeControl.swift in Sources */,
 				05979CA41BC1898C00F5EA5F /* MainTableViewController.swift in Sources */,
 				C951CA3F1F67E78200CB5668 /* CropView.swift in Sources */,
@@ -466,6 +474,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		3362E1351F6A3DA1008B1681 /* Notes.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				3362E1361F6A3DA1008B1681 /* Notes.xcdatamodel */,
+			);
+			currentVersion = 3362E1361F6A3DA1008B1681 /* Notes.xcdatamodel */;
+			path = Notes.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 05979C861BC1872D00F5EA5F /* Project object */;
 }
