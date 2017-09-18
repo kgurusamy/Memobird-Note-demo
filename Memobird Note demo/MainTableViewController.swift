@@ -127,35 +127,38 @@ class MainTableViewController: UITableViewController,UISearchResultsUpdating  {
         
         let detailViewController = segue.source as! DetailTableViewController
         let index = detailViewController.index
-        let subModel = detailViewController.subModelArray
-        
+        let subModel : [subNote]! = detailViewController.subNoteArray
+      
         let fetchRequest: NSFetchRequest<Notes> = Notes.fetchRequest()
      
         do {
             let records = try CoreDataStack.managedObjectContext.fetch(fetchRequest)
             let saveNote : Notes  = records[index!]
         
-        saveNote.subNote = subModel! as NSObject
+            saveNote.subNote = subModel! as NSObject
             
-        saveNote.modified_time = Date() as NSDate
-    
-        for i in 0..<subModel!.count {
-            if subModel?[i] is String {
-                let localString = subModel?[i] as? String
-                if((localString?.characters.count)! > 0 && localString != " ")
-                {
-                    saveNote.name = subModel![i] as? String
-                    break
+            saveNote.modified_time = Date() as NSDate
+            saveNote.name = nil
+            for i in 0..<subModel!.count {
+                if subModel?[i].type == contentType.text.rawValue {
+                    let localString = subModel?[i].text
+                    if((localString?.characters.count)! > 0 && localString != " ")
+                    {
+                        saveNote.name = subModel![i].text
+                        break
+                    }
                 }
             }
-        }
+            if(saveNote.name == nil)
+            {
+                saveNote.name = " "
+            }
 
-        } catch {
+            } catch {
             print(error)
-        }
-        
-        CoreDataStack.saveContext()
-        tableView.reloadData()
+            }
+            CoreDataStack.saveContext()
+            tableView.reloadData()
     }
 
   
@@ -168,7 +171,7 @@ class MainTableViewController: UITableViewController,UISearchResultsUpdating  {
             let detailViewController = segue.destination as! DetailTableViewController
             detailViewController.index = path?.row
             
-            detailViewController.subModelArray = notes[(path?.row)!].subNote as? [Any]
+            detailViewController.subNoteArray = notes[(path?.row)!].subNote as? [subNote]
         }
     }
     
@@ -196,21 +199,15 @@ class MainTableViewController: UITableViewController,UISearchResultsUpdating  {
 
     func getSavedData()
     {
-        
         let fetchRequest: NSFetchRequest<Notes> = Notes.fetchRequest()
         
         do {
 
             notes = try CoreDataStack.managedObjectContext.fetch(fetchRequest)
-            
-            for record in notes {
-                
-                print("Note name : \(record.name ?? " ")")
-                print("Date created :\(String(describing: record.modified_time ?? nil))")
-            }
-            
+         
         } catch {
             print(error)
         }
     }
+    
 }

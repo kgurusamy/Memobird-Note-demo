@@ -18,9 +18,9 @@
 		33437F9F1F664A980031A16A /* delete_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 33437F9C1F664A980031A16A /* delete_icon.png */; };
 		33437FA01F664A980031A16A /* edit_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 33437F9D1F664A980031A16A /* edit_icon.png */; };
 		33437FA21F66544A0031A16A /* move_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 33437FA11F66544A0031A16A /* move_icon.png */; };
-		33437FA61F6685BB0031A16A /* CustomImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33437FA51F6685BB0031A16A /* CustomImage.swift */; };
 		3362E1371F6A3DA1008B1681 /* Notes.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3362E1351F6A3DA1008B1681 /* Notes.xcdatamodeld */; };
 		3362E1A31F6A5609008B1681 /* CoreDataStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3362E1A21F6A5609008B1681 /* CoreDataStack.swift */; };
+		33D7CA1D1F6F8BEC0060FC58 /* subNoteModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 33D7CA1C1F6F8BEC0060FC58 /* subNoteModel.swift */; };
 		33F8EB051F6803930083FB72 /* PhotoCropEditor.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 33F8EB031F6803650083FB72 /* PhotoCropEditor.framework */; };
 		33F8EB061F6803930083FB72 /* PhotoCropEditor.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 33F8EB031F6803650083FB72 /* PhotoCropEditor.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		C951CA3E1F67E78200CB5668 /* CropRectView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C951CA351F67E78200CB5668 /* CropRectView.swift */; };
@@ -62,9 +62,9 @@
 		33437F9C1F664A980031A16A /* delete_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = delete_icon.png; sourceTree = "<group>"; };
 		33437F9D1F664A980031A16A /* edit_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = edit_icon.png; sourceTree = "<group>"; };
 		33437FA11F66544A0031A16A /* move_icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = move_icon.png; sourceTree = "<group>"; };
-		33437FA51F6685BB0031A16A /* CustomImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CustomImage.swift; sourceTree = "<group>"; };
 		3362E1361F6A3DA1008B1681 /* Notes.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Notes.xcdatamodel; sourceTree = "<group>"; };
 		3362E1A21F6A5609008B1681 /* CoreDataStack.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStack.swift; sourceTree = "<group>"; };
+		33D7CA1C1F6F8BEC0060FC58 /* subNoteModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = subNoteModel.swift; sourceTree = "<group>"; };
 		33F8EB031F6803650083FB72 /* PhotoCropEditor.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = PhotoCropEditor.framework; path = "Memobird Note demo/PhotoCropEditor.framework"; sourceTree = "<group>"; };
 		C951CA351F67E78200CB5668 /* CropRectView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CropRectView.swift; sourceTree = "<group>"; };
 		C951CA361F67E78200CB5668 /* CropView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CropView.swift; sourceTree = "<group>"; };
@@ -167,7 +167,7 @@
 		C951CA4F1F67FA2600CB5668 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				33437FA51F6685BB0031A16A /* CustomImage.swift */,
+				33D7CA1C1F6F8BEC0060FC58 /* subNoteModel.swift */,
 				3362E1A21F6A5609008B1681 /* CoreDataStack.swift */,
 			);
 			name = Model;
@@ -281,11 +281,11 @@
 			files = (
 				05979CA61BC19BC700F5EA5F /* DetailTableViewController.swift in Sources */,
 				3362E1371F6A3DA1008B1681 /* Notes.xcdatamodeld in Sources */,
+				33D7CA1D1F6F8BEC0060FC58 /* subNoteModel.swift in Sources */,
 				3362E1A31F6A5609008B1681 /* CoreDataStack.swift in Sources */,
 				C951CA441F67E78200CB5668 /* ResizeControl.swift in Sources */,
 				05979CA41BC1898C00F5EA5F /* MainTableViewController.swift in Sources */,
 				C951CA3F1F67E78200CB5668 /* CropView.swift in Sources */,
-				33437FA61F6685BB0031A16A /* CustomImage.swift in Sources */,
 				C951CA3E1F67E78200CB5668 /* CropRectView.swift in Sources */,
 				05979C921BC1872D00F5EA5F /* AppDelegate.swift in Sources */,
 				C951CA401F67E78200CB5668 /* CropViewController.swift in Sources */,

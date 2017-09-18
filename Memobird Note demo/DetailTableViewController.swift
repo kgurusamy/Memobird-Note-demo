@@ -15,12 +15,16 @@ let imageViewDefaultTag = 20
 let imageOptionsViewDefaultTag = 30
 let longPressButtonDefaultTag = 40
 let imageDescriptionDefaultTag = 50
-
+// For checking content type
+enum contentType: Int {
+    case text = 0
+    case image = 1
+}
 
 class DetailTableViewController: UITableViewController, UITextFieldDelegate, UIImagePickerControllerDelegate, UINavigationControllerDelegate,CropViewControllerDelegate {
-
+   
     var index:Int?
-    var subModelArray:[Any]?
+    var subNoteArray:[subNote]?
     let imagePicker = UIImagePickerController()
     var selectedRowIndex = 0
     var viewHasMoved = false
@@ -31,17 +35,20 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         
         imagePicker.delegate = self
         tableView.rowHeight = UITableViewAutomaticDimension
-        print("subModelArrayCount : \(subModelArray?.count ?? 0)")
+        print("subNoteArrayCount : \(subNoteArray?.count ?? 0)")
 
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        if(subModelArray == nil){
-            subModelArray = []
-            let emptyString :String = " "
-            subModelArray?.append(emptyString)
+        if(subNoteArray == nil){
+            subNoteArray = []
+            let emptyImage:UIImage? = nil
+            let emptyNote = subNote(type : contentType.text.rawValue, image: emptyImage,text: " ")
+            
+            //let emptyString :String = " "
+            subNoteArray?.append(emptyNote)
         }
         
     }
@@ -111,7 +118,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
                 My.cellSnapshot?.frame = CGRect(x:(My.cellSnapshot?.frame.origin.x)!, y:(My.cellSnapshot?.frame.origin.y)!,width:(My.cellSnapshot?.frame.size.width)!, height : 40)
                 My.cellSnapshot!.center = center
                 if ((indexPath != nil) && (indexPath != Path.initialIndexPath)) {
-                    subModelArray?.insert(subModelArray?.remove(at: Path.initialIndexPath!.row) ?? "", at: indexPath!.row)
+                    subNoteArray?.insert((subNoteArray?.remove(at: Path.initialIndexPath!.row))!, at: indexPath!.row)
                     tableView.moveRow(at: Path.initialIndexPath!, to: indexPath!)
                     Path.initialIndexPath = indexPath
                 }
@@ -189,8 +196,9 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     // MARK: - TABLEVIEW DELEGATE methods
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        
-        if ((subModelArray?[indexPath.row] as? customImage) != nil){
+        let subNoteData = subNoteArray?[indexPath.row]
+        //if ((subNoteArray?[indexPath.row] as? customImage) != nil){
+        if ((subNoteData?.image) != nil){
             if(viewHasMoved == true){
                 return 40
             }
@@ -214,8 +222,8 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        if (subModelArray?.count != nil) {
-            return (subModelArray?.count)!
+        if (subNoteArray?.count != nil) {
+            return (subNoteArray?.count)!
         }
         else{
             return 0
@@ -230,13 +238,13 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath as IndexPath)
         
-          if subModelArray?[indexPath.row] is String{
+          if subNoteArray?[indexPath.row].type == contentType.text.rawValue {
             let myTextField : UITextField! = cell.contentView.viewWithTag(textFieldDefaultTag) as! UITextField!
             let myImageView : UIImageView! = cell.contentView.viewWithTag(imageViewDefaultTag) as! UIImageView!
             myImageView.image = nil
             myTextField.delegate = self
             myTextField.font = .systemFont(ofSize: 18)
-            myTextField.text = subModelArray?[indexPath.row] as? String
+            myTextField.text = subNoteArray?[indexPath.row].text
             myTextField.frame = CGRect(x: 0, y: 0, width: tableView.frame.size.width-10, height:cell.contentView.frame.size.height)
             myTextField.addTarget(self, action: #selector(textFieldDidChange(textField:)), for: .editingChanged)
             myTextField.autocorrectionType = .no
@@ -283,22 +291,21 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             let tapImageView = UITapGestureRecognizer(target: self, action: #selector(self.tapGestureForImageView(_:)))
             myImageView.addGestureRecognizer(tapImageView)
             
-            let customImageObj = subModelArray?[indexPath.row] as? customImage
+            let customImageObj = subNoteArray?[indexPath.row]
             myImageView.image = customImageObj?.image
-            print("Image description : \(customImageObj?.imageDescription ?? "")")
-             let imageDescription : UITextField! = cell.contentView.viewWithTag(imageDescriptionDefaultTag) as? UITextField
-            //myImageView.image = subModelArray[indexPath.row] as? UIImage
            
-                imageDescription?.frame = CGRect(x : 30, y: 208, width : tableView.frame.size.width-60, height:30)
-            //imageDescription.backgroundColor = .lightGray
+            let imageDescription : UITextField! = cell.contentView.viewWithTag(imageDescriptionDefaultTag) as? UITextField
+            imageDescription?.frame = CGRect(x : 30, y: 208, width : tableView.frame.size.width-60, height:30)
             imageDescription.delegate = self
             imageDescription.font = .systemFont(ofSize: 12)
             imageDescription.placeholder = "Picture Description"
             imageDescription.autocorrectionType = .no
-            let imgDescCharactersCount = (customImageObj?.imageDescription.characters.count)
+            
+            let imgDescCharactersCount = (customImageObj?.text.characters.count)
+            
             if(imgDescCharactersCount != nil && imgDescCharactersCount! > 0){
-            imageDescription.text = customImageObj?.imageDescription
-            imageDescription.isHidden = false
+                imageDescription.text = customImageObj?.text
+                imageDescription.isHidden = false
             }else{
                 imageDescription.isHidden = true
             }
@@ -352,26 +359,28 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         imagePicker.allowsEditing = true
         self.present(imagePicker, animated: true, completion: nil)
     }
+    
     func imagePickerController(
         _ picker: UIImagePickerController,
         didFinishPickingMediaWithInfo info: [String : Any])
     {
         
         if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
-            let customImageObj = customImage(image:image, imageDescription:"")
-            subModelArray?.insert(customImageObj, at: selectedRowIndex+1)
+            let customImageObj = subNote(type : contentType.image.rawValue, image:image, text:"")
+            subNoteArray?.insert(customImageObj, at: selectedRowIndex+1)
             //subModelArray.insert(image, at: selectedRowIndex+1)
             
             tableView.reloadData()
         }
         self.dismiss(animated: true, completion: nil)
     }
+    
     // MARK: - Navigation
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "save" {
             let indexPaths  = indexPathsForRowsInSection(0, numberOfRows: tableView.numberOfRows(inSection: 0))
-            subModelArray?.removeAll()
+            subNoteArray?.removeAll()
             for i in 0 ..< indexPaths.count
             {
                 let cell = tableView.cellForRow(at: (indexPaths[i]) as IndexPath)
@@ -380,19 +389,21 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             let imageDescription : UITextField? = cell?.contentView.viewWithTag(imageDescriptionDefaultTag) as? UITextField
                
                 if(myImageView?.image != nil){
-                    let myCustomImage = customImage(image: (myImageView?.image)!, imageDescription: (imageDescription?.text)!)
-                    subModelArray?.append(myCustomImage as Any)
+                    
+                    //let myCustomImage = customImage(image: (myImageView?.image)!, imageDescription: (imageDescription?.text)!)
+                    let mysubNoteData = subNote(type : contentType.image.rawValue, image : (myImageView?.image)!, text:(imageDescription?.text)!)
+                    subNoteArray?.append(mysubNoteData)
                 }
                 else{
-                    subModelArray?.append(myTextField?.text ?? "")
+                    let dummyImage : UIImage? = nil
+                    let mysubNoteData = subNote(type : contentType.text.rawValue, image : dummyImage, text : myTextField?.text ?? " " )
+                    subNoteArray?.append(mysubNoteData)
                 }
             }
         }
     }
     
     // MARK: - TextField Methods
-  //myphotoedittextfiled
-
 
     func textFieldDidChange(textField: UITextField) {
         
@@ -401,7 +412,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             let currentCell : UITableViewCell! = textField.superview?.superview as! UITableViewCell
             let currentIndexpath : NSIndexPath! = tableView.indexPath(for: currentCell)! as NSIndexPath
             selectedRowIndex = currentIndexpath!.row
-            subModelArray?[currentIndexpath!.row] = textField.text!
+            subNoteArray?[currentIndexpath!.row].text = textField.text!
         }
     }
     
@@ -412,7 +423,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         let currentIndexpath : NSIndexPath! = tableView.indexPath(for: currentCell)! as NSIndexPath
         selectedRowIndex = currentIndexpath!.row
 
-        createNewCell(tag: (currentIndexpath!.row))
+        createNewCell(atIndex: (currentIndexpath!.row))
         }
         return true
     }
@@ -435,7 +446,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
                     let currentIndexpath : NSIndexPath! = tableView.indexPath(for: currentCell)! as NSIndexPath
                     
                     textField.resignFirstResponder()
-                    deleteCell(tag: currentIndexpath!.row)
+                    deleteCell(atIndex: currentIndexpath!.row)
                 }
                 
                 print("\(cursorPosition)")
@@ -451,22 +462,21 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
                 let currentIndexpath : NSIndexPath! = tableView.indexPath(for: currentCell)! as NSIndexPath
                 selectedRowIndex = currentIndexpath!.row
                 
-                createNewCell(tag: (currentIndexpath!.row))
+                createNewCell(atIndex:  (currentIndexpath!.row))
                 
             }
-
         }
-        
-        
         return combinedString.size().width < textField.bounds.size.width
     }
 
     @IBAction func photo_discription_btn(_ sender: UIButton)
     {
         let currentCell : UITableViewCell! = sender.superview?.superview?.superview as! UITableViewCell
-        let currentIndexpath : NSIndexPath! = tableView.indexPath(for: currentCell)! as NSIndexPath
+
         let myImageOptionsView : UIView! = currentCell.contentView.viewWithTag(imageOptionsViewDefaultTag) as UIView!
-         var myphotoedittextfiled : UITextField! = currentCell.contentView.viewWithTag(imageDescriptionDefaultTag) as! UITextField!
+        
+        let myphotoedittextfiled : UITextField! = currentCell.contentView.viewWithTag(imageDescriptionDefaultTag) as! UITextField!
+        
         myphotoedittextfiled.isHidden = false
         myImageOptionsView.isHidden = true
         self.setInitialFocuspicturedescription()
@@ -476,75 +486,73 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     var cropimageindex = 0
     @IBAction func crop_btn(_ sender: UIButton)
     {
-         let controller = CropViewController()
-         controller.delegate = self
+        let controller = CropViewController()
+        controller.delegate = self
         let currentCell : UITableViewCell! = sender.superview?.superview?.superview as! UITableViewCell
         let currentIndexpath : NSIndexPath! = tableView.indexPath(for: currentCell)! as NSIndexPath
         cropimageindex = currentIndexpath.row
-        let customImageObj = subModelArray?[currentIndexpath.row] as? customImage
-       // let imageName = "cropimg.jpg"
-       // let image = UIImage(named: imageName)
-         controller.image = customImageObj?.image
+        let customImageObj = subNoteArray?[currentIndexpath.row].image
+
+        controller.image = customImageObj
          
-         let navController = UINavigationController(rootViewController: controller)
-         present(navController, animated: true, completion: nil)
+        let navController = UINavigationController(rootViewController: controller)
+        present(navController, animated: true, completion: nil)
         
     }
-// Delete image action
+    // Delete image action
     @IBAction func delete_image_clicked(_ sender : UIButton)
     {
         let currentCell : UITableViewCell! = sender.superview?.superview?.superview as! UITableViewCell
         let currentIndexpath : NSIndexPath! = tableView.indexPath(for: currentCell)! as NSIndexPath
         let myImageOptionsView : UIView! = currentCell.contentView.viewWithTag(imageOptionsViewDefaultTag) as UIView!
         myImageOptionsView.isHidden = true
-        deleteCell(tag: currentIndexpath.row)
+        deleteCell(atIndex: currentIndexpath.row)
     }
     
- //Deleting string backspace
-    func deleteCell(tag : Int)
+    //Deleting string backspace
+    func deleteCell(atIndex : Int)
     {
-        if((subModelArray?.count)!>1){
-            subModelArray?.remove(at: tag)
+        if((subNoteArray?.count)!>1){
+            subNoteArray?.remove(at: atIndex)
             UIView.animate(withDuration: 0.2, delay: 0, usingSpringWithDamping: 1,initialSpringVelocity: 1, options:[], animations: {
-            self.tableView.reloadData()
-                 }, completion: { (finished: Bool) in
-                    print("deleteCell method : tag : \(tag)")
-                    //let indexPaths = self.tableView.indexPathsForVisibleRows
-                     let indexPaths  = self.indexPathsForRowsInSection(0, numberOfRows: self.tableView.numberOfRows(inSection: 0))
-                    //var myIndexPath = IndexPath()
-                    var cell : UITableViewCell!
-                    if (indexPaths.count)>1 {
-                        cell =  self.tableView.cellForRow(at: (indexPaths[tag-1]) as IndexPath)
-                    }
-                    else {
-                        cell =  self.tableView.cellForRow(at: (indexPaths[0]) as IndexPath)
-                    }
-                    if(cell != nil)
-                    {
-                        cell?.setSelected(true, animated:true)
-                        
-                        let previousTextField : UITextField! = cell!.contentView.viewWithTag(textFieldDefaultTag) as! UITextField
-                        if(previousTextField.canBecomeFirstResponder){
-                            if(previousTextField.text?.characters.count==0){
+                self.tableView.reloadData()
+                
+            }, completion: { (finished: Bool) in
+                   
+                let indexPaths  = self.indexPathsForRowsInSection(0, numberOfRows: self.tableView.numberOfRows(inSection: 0))
+                var cell : UITableViewCell!
+                if (indexPaths.count)>1 {
+                    cell =  self.tableView.cellForRow(at: (indexPaths[atIndex-1]) as IndexPath)
+                }
+                else {
+                
+                    cell =  self.tableView.cellForRow(at: (indexPaths[0]) as IndexPath)
+                }
+                if(cell != nil){
+                    
+                    cell?.setSelected(true, animated:true)
+                    let previousTextField : UITextField! = cell!.contentView.viewWithTag(textFieldDefaultTag) as! UITextField
+                    if(previousTextField.canBecomeFirstResponder){
+                        if(previousTextField.text?.characters.count==0){
                                 previousTextField.text? = " "
-                            }
-                            previousTextField.becomeFirstResponder()
                         }
+                        previousTextField.becomeFirstResponder()
                     }
+                }
             })
-          
         }
     }
+    
     //Creating new cell
-    func createNewCell(tag : Int)
-    {
-        let emptyRow : String = " "
-        subModelArray?.insert(emptyRow, at: tag+1)
+    func createNewCell(atIndex : Int)
+    {   let emptyImage : UIImage? = nil
+        let emptyNote = subNote(type : contentType.text.rawValue, image : emptyImage, text : " ")
+        subNoteArray?.insert(emptyNote, at: atIndex+1)
         UIView.animate(withDuration: 0.1, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options:[], animations: {
              self.tableView.reloadData()
         }, completion: { (finished: Bool) in
             let indexPaths =  self.indexPathsForRowsInSection(0, numberOfRows: self.tableView.numberOfRows(inSection: 0))
-            let cell =  self.tableView.cellForRow(at: (indexPaths[tag+1]) as IndexPath)
+            let cell =  self.tableView.cellForRow(at: (indexPaths[atIndex+1]) as IndexPath)
             if((cell?.contentView.viewWithTag(textFieldDefaultTag)) != nil)
             {
                 cell?.setSelected(true, animated:true)
@@ -553,11 +561,12 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             }
         })
     }
+    
     //Initial Textfield focus point
     func setInitialFocus()
     {
         let indexPaths  = indexPathsForRowsInSection(0, numberOfRows: tableView.numberOfRows(inSection: 0))
-        let cell =  self.tableView.cellForRow(at: (indexPaths[(subModelArray?.count)!-1]) as IndexPath)
+        let cell =  self.tableView.cellForRow(at: (indexPaths[(subNoteArray?.count)!-1]) as IndexPath)
         if((cell?.contentView.viewWithTag(textFieldDefaultTag)) != nil)
         {
             cell?.setSelected(true, animated:true)
@@ -566,11 +575,12 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             currentTextField.becomeFirstResponder()
         }
     }
+    
     func setInitialFocuspicturedescription()
     {
         
         let indexPaths  = indexPathsForRowsInSection(0, numberOfRows: tableView.numberOfRows(inSection: 0))
-        let cell =  self.tableView.cellForRow(at: (indexPaths[(subModelArray?.count)!-1]) as IndexPath)
+        let cell =  self.tableView.cellForRow(at: (indexPaths[(subNoteArray?.count)!-1]) as IndexPath)
         if((cell?.contentView.viewWithTag(imageDescriptionDefaultTag)) != nil)
         {
             cell?.setSelected(true, animated:true)
@@ -584,27 +594,25 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     func indexPathsForRowsInSection(_ section: Int, numberOfRows: Int) -> [NSIndexPath] {
         return (0..<numberOfRows).map{NSIndexPath(row: $0, section: section)}
     }
-// MARK: - CropView
-func cropViewController(_ controller: CropViewController, didFinishCroppingImage image: UIImage) {
-}
+    // MARK: - CropView
+    func cropViewController(_ controller: CropViewController, didFinishCroppingImage image: UIImage) {
+    }
 
-func cropViewController(_ controller: CropViewController, didFinishCroppingImage image: UIImage, transform: CGAffineTransform, cropRect: CGRect){
+    func cropViewController(_ controller: CropViewController, didFinishCroppingImage image: UIImage, transform: CGAffineTransform, cropRect: CGRect){
     
-    let customImageObj = subModelArray?[cropimageindex] as? customImage
-    let imageDesc = customImageObj?.imageDescription
-    customImageObj?.image = image
-    customImageObj?.imageDescription = imageDesc!
-    subModelArray?[cropimageindex] = customImageObj!
+    let customSubNoteObj = subNoteArray?[cropimageindex]
+    let imageDesc = customSubNoteObj?.text
+    customSubNoteObj?.image = image
+    customSubNoteObj?.text = imageDesc!
+    subNoteArray?[cropimageindex] = customSubNoteObj!
     controller.dismiss(animated: true, completion: nil)
     tableView .reloadData()
    }
 
-func cropViewControllerDidCancel(_ controller: CropViewController) {
-    controller.dismiss(animated: true, completion: nil)
-}
-
-// MARK: - UIImagePickerController delegate methods
-
+    func cropViewControllerDidCancel(_ controller: CropViewController) {
+        controller.dismiss(animated: true, completion: nil)
+    }
+   
 }
 
 extension UITextField {
