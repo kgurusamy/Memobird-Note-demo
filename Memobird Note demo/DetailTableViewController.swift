@@ -565,6 +565,9 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     //Initial Textfield focus point
     func setInitialFocus()
     {
+        if(subNoteArray?.count==0){
+            createNewCell(atIndex: -1)
+        }
         let indexPaths  = indexPathsForRowsInSection(0, numberOfRows: tableView.numberOfRows(inSection: 0))
         let cell =  self.tableView.cellForRow(at: (indexPaths[(subNoteArray?.count)!-1]) as IndexPath)
         if((cell?.contentView.viewWithTag(textFieldDefaultTag)) != nil)
