@@ -421,7 +421,8 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
                 var imageName = Date().description
                 imageName = imageName.replacingOccurrences(of: " ", with: "") + ".png"
                 let fullImagePath = imagesDirectoryPath + "/\(imageName)"
-                let data = UIImagePNGRepresentation(image)
+                let myImage = fixOrientation(image: image)
+                let data = UIImagePNGRepresentation(myImage)
                 let success = FileManager.default.createFile(atPath: fullImagePath, contents: data, attributes: nil)
                 if(success){
                     let customImageObj = subNote(type : contentType.image.rawValue, imageName:imageName , text:"")
@@ -702,6 +703,72 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         controller.dismiss(animated: true, completion: nil)
     }
    
+}
+
+func fixOrientation(image: UIImage) -> UIImage {
+    // No-op if the orientation is already correct
+    if (image.imageOrientation == UIImageOrientation.up) { return image; }
+    
+    print(image.imageOrientation)
+    
+    // We need to calculate the proper transformation to make the image upright.
+    // We do it in 2 steps: Rotate if Left/Right/Down, and then flip if Mirrored.
+    var transform = CGAffineTransform.identity
+    
+    switch (image.imageOrientation) {
+    case .down, .downMirrored:
+        transform = transform.translatedBy(x: image.size.width, y: image.size.height)
+        transform = transform.rotated(by: .pi)
+        break
+    case .left, .leftMirrored:
+        transform = transform.translatedBy(x: image.size.width, y: 0)
+        transform = transform.rotated(by: .pi/2)
+        break
+    case .right, .rightMirrored:
+        transform = transform.translatedBy(x: 0, y: image.size.height)
+        transform = transform.rotated(by: -.pi/2)
+        break
+    case .up, .upMirrored:
+        break
+    }
+    
+    switch (image.imageOrientation) {
+    case .upMirrored, .downMirrored:
+        transform = transform.translatedBy(x: image.size.width, y: 0)
+        transform = transform.scaledBy(x: -1, y: 1)
+        break
+    case .leftMirrored, .rightMirrored:
+        transform = transform.translatedBy(x: image.size.height, y: 0)
+        transform = transform.scaledBy(x: -1, y: 1)
+        break
+    case .up, .down, .left, .right:
+        break
+    }
+    
+    // Now we draw the underlying CGImage into a new context, applying the transform
+    // calculated above.
+    
+    let ctx = CGContext(data: nil, width: Int(image.size.width), height: Int(image.size.height), bitsPerComponent: image.cgImage!.bitsPerComponent, bytesPerRow: 0, space: image.cgImage!.colorSpace!, bitmapInfo: image.cgImage!.bitmapInfo.rawValue)
+    
+    ctx!.concatenate(transform);
+    
+    switch (image.imageOrientation) {
+    case .left, .leftMirrored, .right, .rightMirrored:
+        // Grr...
+        ctx?.draw(image.cgImage!, in: CGRect(origin: .zero, size: CGSize(width: image.size.height, height: image.size.width)))
+        
+        break
+        
+    default:
+        ctx?.draw(image.cgImage!, in: CGRect(origin: .zero, size: CGSize(width: image.size.width, height: image.size.height)))
+        break
+    }
+    
+    // And now we just create a new UIImage from the drawing context
+    let cgimg = ctx!.makeImage()
+    let img = UIImage(cgImage: cgimg!)
+    
+    return img
 }
 
 extension UITextField {
