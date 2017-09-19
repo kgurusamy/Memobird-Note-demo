@@ -12,35 +12,27 @@ import UIKit
 class subNote : NSObject,NSCoding {
 
     var type: Int // 0 - text, 1 - image
-    var image: UIImage?
+    var imageName: String
     var text : String
     
-    init(type : Int, image:UIImage?, text:String)
+    init(type : Int, imageName:String, text:String)
     {
         self.type = type
-        self.image = image
+        self.imageName = imageName
         self.text = text
     }
     
     // MARK: NSCoding
     
-    required convenience init?(coder decoder: NSCoder) {
-        guard
-            let type = decoder.decodeObject(forKey: "type") as? Int,
-            let image = decoder.decodeObject(forKey: "image") as? UIImage,
-            let text = decoder.decodeObject(forKey: "text") as? String
-            else { return nil }
-        
-        self.init(
-            type : type,
-            image: image,
-            text: text
-        )
+    required init(coder decoder: NSCoder) {
+            self.type = decoder.decodeInteger(forKey: "type")
+            self.imageName = (decoder.decodeObject(forKey: "imageName") as? String) ?? ""
+            self.text = (decoder.decodeObject(forKey: "text") as? String) ?? ""
     }
     
     func encode(with coder: NSCoder) {
         coder.encode(self.type, forKey: "type")
-        coder.encode(self.image, forKey: "image")
+        coder.encode(self.imageName, forKey: "imageName")
         coder.encode(self.text, forKey: "text")
     }
 

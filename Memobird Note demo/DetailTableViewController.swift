@@ -29,13 +29,20 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     var selectedRowIndex = 0
     var viewHasMoved = false
     var movingCellIndexPath : NSIndexPath? = nil
+    
+    var imagesDirectoryPath:String!
+    var dragselectedRowIndex = 0
+    var dragimageselected = false
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        createImagesFolder()
+        
         imagePicker.delegate = self
         tableView.rowHeight = UITableViewAutomaticDimension
-        print("subNoteArrayCount : \(subNoteArray?.count ?? 0)")
+        
 
     }
     
@@ -44,11 +51,11 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         
         if(subNoteArray == nil){
             subNoteArray = []
-            let emptyImage:UIImage? = nil
-            let emptyNote = subNote(type : contentType.text.rawValue, image: emptyImage,text: " ")
+            //let emptyImage:UIImage? = nil
+            let emptyNote = subNote(type : contentType.text.rawValue, imageName: "some image name",text: " ")
             
             //let emptyString :String = " "
-            subNoteArray?.append(emptyNote)
+            subNoteArray?.insert(emptyNote,at: 0)
         }
         
     }
@@ -63,6 +70,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         let state = longPress.state
         let locationInView = longPress.location(in: tableView)
         var indexPath = tableView.indexPathForRow(at: locationInView)
+        dragselectedRowIndex = (indexPath?.row)!
         
         struct My {
             static var cellSnapshot : UIView? = nil
@@ -76,6 +84,13 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         switch state {
         case UIGestureRecognizerState.began:
             if indexPath != nil {
+                
+                tableView.rowHeight = UITableViewAutomaticDimension
+                tableView.beginUpdates()
+                tableView.reloadData()
+                tableView.endUpdates()
+                
+                dragimageselected = true
                 Path.initialIndexPath = indexPath
                 let cell = tableView.cellForRow(at: indexPath!) as UITableViewCell!
                 My.cellSnapshot  = snapshotOfCell(cell!)
@@ -126,7 +141,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             }
         default:
             viewHasMoved = false
-
+            dragimageselected = false
             if Path.initialIndexPath != nil {
                 let cell = tableView.cellForRow(at: Path.initialIndexPath!) as UITableViewCell!
                 if(cell != nil){
@@ -196,20 +211,45 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     // MARK: - TABLEVIEW DELEGATE methods
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let subNoteData = subNoteArray?[indexPath.row]
-        //if ((subNoteArray?[indexPath.row] as? customImage) != nil){
-        if ((subNoteData?.image) != nil){
-            if(viewHasMoved == true){
-                return 40
+        var height:CGFloat = CGFloat()
+        let mySubNoteData = subNoteArray?[indexPath.row]
+        if (mySubNoteData?.type == contentType.image.rawValue)
+        {
+            if(viewHasMoved == true)
+            {
+                if( dragselectedRowIndex == indexPath.row)
+                {
+                    height = 40
+                }
+                else
+                {
+                    height = 240
+                }
             }
-            else{
-                return 240
+            else
+            {
+                if( dragselectedRowIndex == indexPath.row)
+                {
+                    if (dragimageselected == true)
+                    {
+                        height = 40
+                    }
+                    else
+                    {
+                        height = 240
+                    }
+                }
+                else
+                {
+                    height = 240
+                }
             }
+            //return 240
+        }else{
+            height = 40
         }
-        return 40
-        //Not expanded
+        return height
     }
-
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.reloadRows(at: [indexPath], with: .automatic)
@@ -292,7 +332,14 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             myImageView.addGestureRecognizer(tapImageView)
             
             let customImageObj = subNoteArray?[indexPath.row]
-            myImageView.image = customImageObj?.image
+           
+            let data = FileManager.default.contents(atPath: imagesDirectoryPath + "/\(customImageObj?.imageName ?? "")")
+            //let imageData = UIImage(data: data!)
+            myImageView.accessibilityIdentifier = customImageObj?.imageName
+            if(data != nil){
+                myImageView.image = UIImage(data: data!)
+            }
+            //myImageView.image = UIImage(contentsOfFile: (customImageObj?.imageName)!)
            
             let imageDescription : UITextField! = cell.contentView.viewWithTag(imageDescriptionDefaultTag) as? UITextField
             imageDescription?.frame = CGRect(x : 30, y: 208, width : tableView.frame.size.width-60, height:30)
@@ -365,11 +412,22 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         didFinishPickingMediaWithInfo info: [String : Any])
     {
         
-        if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
-            let customImageObj = subNote(type : contentType.image.rawValue, image:image, text:"")
-            subNoteArray?.insert(customImageObj, at: selectedRowIndex+1)
+        if (info[UIImagePickerControllerOriginalImage] as? UIImage) != nil {
+            
             //subModelArray.insert(image, at: selectedRowIndex+1)
             
+             if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
+                // Save image to Document directory
+                var imageName = Date().description
+                imageName = imageName.replacingOccurrences(of: " ", with: "") + ".png"
+                let fullImagePath = imagesDirectoryPath + "/\(imageName)"
+                let data = UIImagePNGRepresentation(image)
+                let success = FileManager.default.createFile(atPath: fullImagePath, contents: data, attributes: nil)
+                if(success){
+                    let customImageObj = subNote(type : contentType.image.rawValue, imageName:imageName , text:"")
+                    subNoteArray?.insert(customImageObj, at: selectedRowIndex+1)
+                }
+            }
             tableView.reloadData()
         }
         self.dismiss(animated: true, completion: nil)
@@ -391,12 +449,13 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
                 if(myImageView?.image != nil){
                     
                     //let myCustomImage = customImage(image: (myImageView?.image)!, imageDescription: (imageDescription?.text)!)
-                    let mysubNoteData = subNote(type : contentType.image.rawValue, image : (myImageView?.image)!, text:(imageDescription?.text)!)
+                    
+                    let mysubNoteData = subNote(type : contentType.image.rawValue, imageName : (myImageView?.accessibilityIdentifier)!, text:(imageDescription?.text)!)
                     subNoteArray?.append(mysubNoteData)
                 }
                 else{
-                    let dummyImage : UIImage? = nil
-                    let mysubNoteData = subNote(type : contentType.text.rawValue, image : dummyImage, text : myTextField?.text ?? " " )
+                    //let dummyImage : UIImage? = nil
+                    let mysubNoteData = subNote(type : contentType.text.rawValue, imageName : "", text : myTextField?.text ?? " " )
                     subNoteArray?.append(mysubNoteData)
                 }
             }
@@ -483,6 +542,25 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     }
     // MARK: - Custom methods
     
+    func createImagesFolder()
+    {
+        let paths = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)
+        // Get the Document directory path
+        let documentDirectorPath:String = paths[0]
+        // Create a new path for the new images folder
+        imagesDirectoryPath = documentDirectorPath + "/ImagePicker"
+        var objcBool:ObjCBool = true
+        let isExist = FileManager.default.fileExists(atPath: imagesDirectoryPath, isDirectory: &objcBool)
+        // If the folder with the given path doesn't exist already, create it
+        if isExist == false{
+            do{
+                try FileManager.default.createDirectory(atPath: imagesDirectoryPath, withIntermediateDirectories: true, attributes: nil)
+            }catch{
+                print("Something went wrong while creating a folder")
+            }
+        }
+    }
+    
     var cropimageindex = 0
     @IBAction func crop_btn(_ sender: UIButton)
     {
@@ -491,10 +569,10 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         let currentCell : UITableViewCell! = sender.superview?.superview?.superview as! UITableViewCell
         let currentIndexpath : NSIndexPath! = tableView.indexPath(for: currentCell)! as NSIndexPath
         cropimageindex = currentIndexpath.row
-        let customImageObj = subNoteArray?[currentIndexpath.row].image
+        let customImageObj = subNoteArray?[currentIndexpath.row].imageName
 
-        controller.image = customImageObj
-         
+        controller.image = UIImage(contentsOfFile :customImageObj!)
+        
         let navController = UINavigationController(rootViewController: controller)
         present(navController, animated: true, completion: nil)
         
@@ -506,6 +584,14 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         let currentIndexpath : NSIndexPath! = tableView.indexPath(for: currentCell)! as NSIndexPath
         let myImageOptionsView : UIView! = currentCell.contentView.viewWithTag(imageOptionsViewDefaultTag) as UIView!
         myImageOptionsView.isHidden = true
+        let mySubNoteObj = subNoteArray?[currentIndexpath.row]
+        // Removing image from local folder
+        let filePath = "\(imagesDirectoryPath!)/\(mySubNoteObj?.imageName ?? "")"
+        do {
+            try FileManager.default.removeItem(atPath: filePath)
+        } catch let error as NSError {
+            print(error.debugDescription)
+        }
         deleteCell(atIndex: currentIndexpath.row)
     }
     
@@ -545,8 +631,8 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     
     //Creating new cell
     func createNewCell(atIndex : Int)
-    {   let emptyImage : UIImage? = nil
-        let emptyNote = subNote(type : contentType.text.rawValue, image : emptyImage, text : " ")
+    {
+        let emptyNote = subNote(type : contentType.text.rawValue, imageName : "some image name", text : " ")
         subNoteArray?.insert(emptyNote, at: atIndex+1)
         UIView.animate(withDuration: 0.1, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options:[], animations: {
              self.tableView.reloadData()
@@ -605,7 +691,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     
     let customSubNoteObj = subNoteArray?[cropimageindex]
     let imageDesc = customSubNoteObj?.text
-    customSubNoteObj?.image = image
+    customSubNoteObj?.imageName = "some image name"
     customSubNoteObj?.text = imageDesc!
     subNoteArray?[cropimageindex] = customSubNoteObj!
     controller.dismiss(animated: true, completion: nil)

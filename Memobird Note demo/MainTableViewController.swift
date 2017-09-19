@@ -24,6 +24,7 @@ class MainTableViewController: UITableViewController,UISearchResultsUpdating  {
         super.viewDidLoad()
     
         getSavedData()
+        
         searchController.searchResultsUpdater = self
         searchController.dimsBackgroundDuringPresentation = false
         definesPresentationContext = true
@@ -135,10 +136,12 @@ class MainTableViewController: UITableViewController,UISearchResultsUpdating  {
             let records = try CoreDataStack.managedObjectContext.fetch(fetchRequest)
             let saveNote : Notes  = records[index!]
         
-            saveNote.subNote = subModel! as NSObject
+            let encodedData = NSKeyedArchiver.archivedData(withRootObject: subModel)
+            saveNote.subNote = encodedData as NSData
             
             saveNote.modified_time = Date() as NSDate
             saveNote.name = nil
+            
             for i in 0..<subModel!.count {
                 if subModel?[i].type == contentType.text.rawValue {
                     let localString = subModel?[i].text
@@ -171,7 +174,17 @@ class MainTableViewController: UITableViewController,UISearchResultsUpdating  {
             let detailViewController = segue.destination as! DetailTableViewController
             detailViewController.index = path?.row
             
-            detailViewController.subNoteArray = notes[(path?.row)!].subNote as? [subNote]
+            if(notes[(path?.row)!].subNote != nil)
+            {
+                let subNoteObj = NSKeyedUnarchiver.unarchiveObject(with: (notes[(path?.row)!].subNote as Data?)!) as? [subNote]
+                
+                detailViewController.subNoteArray = subNoteObj
+            }
+            else
+            {
+                detailViewController.subNoteArray = nil
+            }
+            //detailViewController.subNoteArray = notes[(path?.row)!].subNote as? [subNote]
         }
     }
     
@@ -204,6 +217,22 @@ class MainTableViewController: UITableViewController,UISearchResultsUpdating  {
         do {
 
             notes = try CoreDataStack.managedObjectContext.fetch(fetchRequest)
+            
+            for record in notes
+            {
+                //let subNoteObj = record.subNote
+                print("record name : \(record.name ?? "")")
+                
+                if(record.subNote != nil){
+                let subNoteObj = NSKeyedUnarchiver.unarchiveObject(with: record.subNote! as Data) as! [subNote]
+                
+                print("subNote count : \(String(describing: subNoteObj.count))")
+                
+                print("record subnote[0].text : \(String(describing: subNoteObj[0].text))")
+                print("record subnote[0].imageName : \(String(describing: subNoteObj[0].imageName))")
+                }
+            }
+
          
         } catch {
             print(error)
