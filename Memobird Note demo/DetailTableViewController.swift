@@ -642,9 +642,10 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         let currentCell : UITableViewCell! = sender.superview?.superview?.superview as! UITableViewCell
         let currentIndexpath : NSIndexPath! = tableView.indexPath(for: currentCell)! as NSIndexPath
         cropimageindex = currentIndexpath.row
-        let customImageObj = subNoteArray?[currentIndexpath.row].imageName
-
-        controller.image = UIImage(contentsOfFile :customImageObj!)
+        let customImageObj = subNoteArray?[currentIndexpath.row]
+        
+        let data = FileManager.default.contents(atPath: imagesDirectoryPath + "/\(customImageObj?.imageName ?? "")")
+        controller.image = UIImage(data :data!)
         
         let navController = UINavigationController(rootViewController: controller)
         present(navController, animated: true, completion: nil)
@@ -776,11 +777,23 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
 
     func cropViewController(_ controller: CropViewController, didFinishCroppingImage image: UIImage, transform: CGAffineTransform, cropRect: CGRect){
     
-    let customSubNoteObj = subNoteArray?[cropimageindex]
-    let imageDesc = customSubNoteObj?.text
-    customSubNoteObj?.imageName = "some image name"
-    customSubNoteObj?.text = imageDesc!
-    subNoteArray?[cropimageindex] = customSubNoteObj!
+        let customSubNoteObj = subNoteArray?[cropimageindex]
+        let imageName = customSubNoteObj?.imageName
+        deleteFileWithImageName(imageName: (customSubNoteObj?.imageName)!)
+        
+        let fullImagePath = imagesDirectoryPath + "/\(imageName ?? "")"
+        let data = UIImagePNGRepresentation(image)
+        let success = FileManager.default.createFile(atPath: fullImagePath, contents: data, attributes: nil)
+        if(success){
+            let imageDesc = customSubNoteObj?.text
+            customSubNoteObj?.text = imageDesc!
+            subNoteArray?[cropimageindex] = customSubNoteObj!
+        }
+        
+       
+        
+    
+
     controller.dismiss(animated: true, completion: nil)
     tableView .reloadData()
    }
