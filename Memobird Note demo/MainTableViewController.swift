@@ -247,22 +247,6 @@ class MainTableViewController: UITableViewController,UISearchResultsUpdating  {
         do {
 
             notes = try CoreDataStack.managedObjectContext.fetch(fetchRequest)
-            
-            for record in notes
-            {
-                //let subNoteObj = record.subNote
-                print("record name : \(record.name ?? "")")
-                
-                if(record.subNote != nil){
-                let subNoteObj = NSKeyedUnarchiver.unarchiveObject(with: record.subNote! as Data) as! [subNote]
-                
-                print("subNote count : \(String(describing: subNoteObj.count))")
-                
-                print("record subnote[0].text : \(String(describing: subNoteObj[0].text))")
-                print("record subnote[0].imageName : \(String(describing: subNoteObj[0].imageName))")
-                }
-            }
-
          
         } catch {
             print(error)
