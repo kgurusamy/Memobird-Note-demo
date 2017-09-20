@@ -237,7 +237,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
                 }
                 else
                 {
-                    height = 240
+                    height = 280
                 }
             }
             else
@@ -250,12 +250,12 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
                     }
                     else
                     {
-                        height = 240
+                        height = 280
                     }
                 }
                 else
                 {
-                    height = 240
+                    height = 280
                 }
             }
             //return 240
@@ -333,7 +333,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             
             
             let ImageBGView : UIView! = cell.contentView.viewWithTag(imageBGViewDefaultTag)
-            ImageBGView?.frame = CGRect(x : 24, y: 0, width : tableView.frame.size.width-48, height:238)
+            ImageBGView?.frame = CGRect(x : 24, y: 0, width : tableView.frame.size.width-48, height:278)
             ImageBGView.layer.borderWidth = 2
             ImageBGView.layer.borderColor = UIColor.white.cgColor
             ImageBGView.layer.shadowColor = UIColor.red.cgColor
@@ -352,8 +352,8 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             myTextField.isHidden = true
             
             let myImageView : UIImageView! = cell.contentView.viewWithTag(imageViewDefaultTag) as! UIImageView!
-            myImageView.frame = CGRect(x : 30, y: 5, width : tableView.frame.size.width-60, height:200)
-            myImageView.contentMode = UIViewContentMode.scaleAspectFit
+            myImageView.frame = CGRect(x : 30, y: 5, width : tableView.frame.size.width-60, height:242)
+            myImageView.contentMode = UIViewContentMode.scaleToFill
     
             let longPressButton : UIButton! = cell.contentView.viewWithTag(longPressButtonDefaultTag) as! UIButton!
             longPressButton.frame = CGRect(x: myImageView.frame.origin.x+myImageView.frame.size.width-10,y: myImageView.frame.origin.y+10,width:28,height:28)
@@ -377,7 +377,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             }
             
             let imageDescription : UITextField! = cell.contentView.viewWithTag(imageDescriptionDefaultTag) as? UITextField
-            imageDescription?.frame = CGRect(x : 30, y: 208, width : tableView.frame.size.width-60, height:30)
+            imageDescription?.frame = CGRect(x : 30, y: 246, width : tableView.frame.size.width-60, height:30)
             imageDescription.delegate = self
             imageDescription.font = .systemFont(ofSize: 12)
             imageDescription.placeholder = "Picture Description"
