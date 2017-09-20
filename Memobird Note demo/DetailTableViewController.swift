@@ -370,13 +370,12 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             let customImageObj = subNoteArray?[indexPath.row]
            
             let data = FileManager.default.contents(atPath: imagesDirectoryPath + "/\(customImageObj?.imageName ?? "")")
-            //let imageData = UIImage(data: data!)
+           
             myImageView.accessibilityIdentifier = customImageObj?.imageName
             if(data != nil){
                 myImageView.image = UIImage(data: data!)
             }
-            //myImageView.image = UIImage(contentsOfFile: (customImageObj?.imageName)!)
-           
+            
             let imageDescription : UITextField! = cell.contentView.viewWithTag(imageDescriptionDefaultTag) as? UITextField
             imageDescription?.frame = CGRect(x : 30, y: 208, width : tableView.frame.size.width-60, height:30)
             imageDescription.delegate = self
@@ -452,8 +451,6 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         
         if (info[UIImagePickerControllerOriginalImage] as? UIImage) != nil {
             
-            //subModelArray.insert(image, at: selectedRowIndex+1)
-            
              if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
                 // Save image to Document directory
                 var imageName = Date().description
@@ -487,13 +484,11 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
                
                 if(myImageView?.image != nil){
                     
-                    //let myCustomImage = customImage(image: (myImageView?.image)!, imageDescription: (imageDescription?.text)!)
-                    
                     let mysubNoteData = subNote(type : contentType.image.rawValue, imageName : (myImageView?.accessibilityIdentifier)!, text:(imageDescription?.text)!)
                     subNoteArray?.append(mysubNoteData)
                 }
                 else{
-                    //let dummyImage : UIImage? = nil
+                    
                     let mysubNoteData = subNote(type : contentType.text.rawValue, imageName : "", text : myTextField?.text ?? " " )
                     subNoteArray?.append(mysubNoteData)
                 }
@@ -502,12 +497,12 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     }
     
     override func shouldPerformSegue(withIdentifier identifier: String?, sender: Any?) -> Bool {
-        
+        // Prepare for delete option
         if identifier == "deleteNote" {
             
             if((subNoteArray?.count)! > 0){
             
-            let optionMenu = UIAlertController(title: nil, message: "Delete this Note", preferredStyle: .actionSheet)
+            let optionMenu = UIAlertController(title: nil, message: "Delete this Note?", preferredStyle: .actionSheet)
             
             let deleteAction = UIAlertAction(title: "Delete", style: .default, handler: {
                 (alert: UIAlertAction!) -> Void in
@@ -701,9 +696,6 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     }
     
     // Delete note
-    
-
-    
     func deleteNote(sender : Any?)
     {
         for subNoteObj in subNoteArray!
@@ -755,7 +747,6 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     
     func setInitialFocuspicturedescription()
     {
-        
         let indexPaths  = indexPathsForRowsInSection(0, numberOfRows: tableView.numberOfRows(inSection: 0))
         let cell =  self.tableView.cellForRow(at: (indexPaths[(subNoteArray?.count)!-1]) as IndexPath)
         if((cell?.contentView.viewWithTag(imageDescriptionDefaultTag)) != nil)
@@ -789,13 +780,9 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             customSubNoteObj?.text = imageDesc!
             subNoteArray?[cropimageindex] = customSubNoteObj!
         }
-        
-       
-        
-    
 
-    controller.dismiss(animated: true, completion: nil)
-    tableView .reloadData()
+        controller.dismiss(animated: true, completion: nil)
+        tableView .reloadData()
    }
 
     func cropViewControllerDidCancel(_ controller: CropViewController) {
