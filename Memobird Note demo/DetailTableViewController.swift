@@ -12,6 +12,7 @@ import Photos
 import AssetsLibrary
 let textFieldDefaultTag = 10
 let imageViewDefaultTag = 20
+let imageBGViewDefaultTag = 80
 let imageOptionsViewDefaultTag = 30
 let longPressButtonDefaultTag = 40
 let imageDescriptionDefaultTag = 50
@@ -70,7 +71,10 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         let state = longPress.state
         let locationInView = longPress.location(in: tableView)
         var indexPath = tableView.indexPathForRow(at: locationInView)
-        dragselectedRowIndex = (indexPath?.row)!
+        
+        if(indexPath?.row != nil){
+        dragselectedRowIndex = (indexPath!.row)
+        }
         
         struct My {
             static var cellSnapshot : UIView? = nil
@@ -84,23 +88,22 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         switch state {
         case UIGestureRecognizerState.began:
             if indexPath != nil {
-                
-                tableView.rowHeight = UITableViewAutomaticDimension
                 tableView.beginUpdates()
-                tableView.reloadData()
                 tableView.endUpdates()
-                
+                tableView.reloadData()
+                tableView.rowHeight = UITableViewAutomaticDimension
                 dragimageselected = true
                 Path.initialIndexPath = indexPath
                 let cell = tableView.cellForRow(at: indexPath!) as UITableViewCell!
                 My.cellSnapshot  = snapshotOfCell(cell!)
                 cell?.isHidden = true
                 var center = cell?.center
+
                 My.cellSnapshot?.frame = CGRect(x:(My.cellSnapshot?.frame.origin.x)!, y:(My.cellSnapshot?.frame.origin.y)!,width:(My.cellSnapshot?.frame.size.width)!, height : 40)
                 My.cellSnapshot!.center = center!
                 My.cellSnapshot!.alpha = 0.0
                 tableView.addSubview(My.cellSnapshot!)
-                
+           
                 UIView.animate(withDuration: 0.25, animations: { () -> Void in
                     center?.y = locationInView.y
                     My.cellIsAnimating = true
@@ -121,10 +124,13 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
                         }
                     }
                 })
+
             }
             
         case UIGestureRecognizerState.changed:
             if(indexPath != nil){
+                tableView.beginUpdates()
+                tableView.endUpdates()
             viewHasMoved = true
             movingCellIndexPath = indexPath as NSIndexPath?
             if My.cellSnapshot != nil {
@@ -140,6 +146,8 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             }
             }
         default:
+            tableView.beginUpdates()
+            tableView.endUpdates()
             viewHasMoved = false
             dragimageselected = false
             if Path.initialIndexPath != nil {
@@ -217,6 +225,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         var height:CGFloat = CGFloat()
+        
         let mySubNoteData = subNoteArray?[indexPath.row]
         if (mySubNoteData?.type == contentType.image.rawValue)
         {
@@ -258,6 +267,9 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.reloadRows(at: [indexPath], with: .automatic)
+     
+        tableView.beginUpdates()
+        tableView.endUpdates()
     }
 
      override func numberOfSections(in tableView: UITableView) -> Int {
@@ -284,16 +296,26 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath as IndexPath)
         
           if subNoteArray?[indexPath.row].type == contentType.text.rawValue {
+            let ImageBGView : UIView! = cell.contentView.viewWithTag(imageBGViewDefaultTag)
+
             let myTextField : UITextField! = cell.contentView.viewWithTag(textFieldDefaultTag) as! UITextField!
             let myImageView : UIImageView! = cell.contentView.viewWithTag(imageViewDefaultTag) as! UIImageView!
+            
             myImageView.image = nil
             myTextField.delegate = self
             myTextField.font = .systemFont(ofSize: 18)
             myTextField.text = subNoteArray?[indexPath.row].text
-            myTextField.frame = CGRect(x: 0, y: 0, width: tableView.frame.size.width-10, height:cell.contentView.frame.size.height)
+            myTextField.frame = CGRect(x: 5, y: 0, width: tableView.frame.size.width-12, height:cell.contentView.frame.size.height)
             myTextField.addTarget(self, action: #selector(textFieldDidChange(textField:)), for: .editingChanged)
             myTextField.autocorrectionType = .no
+            if #available(iOS 10.0, *) {
+                myTextField.adjustsFontForContentSizeCategory = false
+                myTextField.adjustsFontSizeToFitWidth = false
+            } else {
+                // Fallback on earlier versions
+            }
             myTextField.isHidden = false
+            ImageBGView.isHidden = true
             self.setInitialFocus()
 
             let longPressButton : UIButton! = cell.contentView.viewWithTag(longPressButtonDefaultTag) as! UIButton!
@@ -308,6 +330,15 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         }
         else
         {
+            
+            
+            let ImageBGView : UIView! = cell.contentView.viewWithTag(imageBGViewDefaultTag)
+            ImageBGView?.frame = CGRect(x : 24, y: 0, width : tableView.frame.size.width-48, height:238)
+            ImageBGView.layer.borderWidth = 2
+            ImageBGView.layer.borderColor = UIColor.white.cgColor
+            ImageBGView.layer.shadowColor = UIColor.red.cgColor
+            ImageBGView.isHidden = false
+
             if(viewHasMoved == true){
                 let myMovingCell = tableView.cellForRow(at: movingCellIndexPath! as IndexPath)
                 if movingCellIndexPath != nil{
@@ -362,6 +393,8 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
                 imageDescription.isHidden = true
             }
         }
+        tableView.beginUpdates()
+        tableView.endUpdates()
         cell.selectionStyle = .none
         // Configure the cell...
         return cell
