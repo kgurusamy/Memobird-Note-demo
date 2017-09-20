@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16F73" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="JfD-yJ-VAk">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16G29" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="JfD-yJ-VAk">
     <device id="retina5_5" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <capability name="Navigation items with more than one left or right bar item" minToolsVersion="7.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -18,10 +19,10 @@
                         <color key="backgroundColor" red="1" green="0.84317951380193501" blue="0.5608505156666006" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="tableCell" rowHeight="82" id="JKt-04-REp">
-                                <rect key="frame" x="0.0" y="55.333333333333336" width="414" height="82"/>
+                                <rect key="frame" x="0.0" y="55" width="414" height="82"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="JKt-04-REp" id="gcM-6d-pPP">
-                                    <rect key="frame" x="0.0" y="0.0" width="414" height="81.666666666666671"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="81"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="hux-TG-BTN">
@@ -117,10 +118,10 @@
                         <color key="backgroundColor" red="0.99387239179999998" green="1" blue="0.82325395050000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <prototypes>
                             <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" selectionStyle="gray" indentationWidth="10" reuseIdentifier="cell" id="cem-53-PbF">
-                                <rect key="frame" x="0.0" y="55.333333333333336" width="414" height="44"/>
+                                <rect key="frame" x="0.0" y="55" width="414" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="cem-53-PbF" id="Weg-eQ-rBn">
-                                    <rect key="frame" x="0.0" y="0.0" width="414" height="43.666666666666664"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="43"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <imageView tag="20" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="E9s-8C-dZq">
@@ -197,17 +198,25 @@
                                 <segue destination="1QE-HA-PaL" kind="unwind" identifier="save" unwindAction="saveToMainViewController:" id="do1-TI-TJO"/>
                             </connections>
                         </barButtonItem>
-                        <barButtonItem key="rightBarButtonItem" systemItem="camera" id="bcM-et-p2h">
-                            <connections>
-                                <action selector="loadImageButtonTappedWithSender:" destination="cfR-wC-pCf" id="fpg-kc-D5c"/>
-                            </connections>
-                        </barButtonItem>
+                        <rightBarButtonItems>
+                            <barButtonItem systemItem="camera" id="bcM-et-p2h">
+                                <connections>
+                                    <action selector="loadImageButtonTappedWithSender:" destination="cfR-wC-pCf" id="fpg-kc-D5c"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem systemItem="trash" id="Nwy-qu-JG1">
+                                <color key="tintColor" red="0.97517484426498413" green="0.097644485533237457" blue="0.012674790807068348" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <connections>
+                                    <segue destination="1QE-HA-PaL" kind="unwind" identifier="deleteNote" unwindAction="deleteNotePressed:" id="J7n-6L-ydo"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
                     </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="EiJ-gh-ql0" userLabel="First Responder" sceneMemberID="firstResponder"/>
                 <exit id="1QE-HA-PaL" userLabel="Exit" sceneMemberID="exit"/>
             </objects>
-            <point key="canvasLocation" x="1866.6666666666667" y="345.6521739130435"/>
+            <point key="canvasLocation" x="2432" y="166"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="ydZ-zw-vZz">

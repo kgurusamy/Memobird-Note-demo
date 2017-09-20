@@ -171,6 +171,11 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         }
     }
     
+    @IBAction func deletebtn(_ sender: Any)
+    {
+        self.performSegue(withIdentifier: "deletee", sender: self)
+
+    }
     func snapshotOfCell(_ inputView: UIView) -> UIView {
         UIGraphicsBeginImageContextWithOptions(inputView.bounds.size, false, 0.0)
         inputView.layer.render(in: UIGraphicsGetCurrentContext()!)
@@ -421,7 +426,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
                 var imageName = Date().description
                 imageName = imageName.replacingOccurrences(of: " ", with: "") + ".png"
                 let fullImagePath = imagesDirectoryPath + "/\(imageName)"
-                let myImage = fixOrientation(image: image)
+                let myImage = self.fixOrientation(image: image)
                 let data = UIImagePNGRepresentation(myImage)
                 let success = FileManager.default.createFile(atPath: fullImagePath, contents: data, attributes: nil)
                 if(success){
@@ -463,6 +468,40 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         }
     }
     
+    override func shouldPerformSegue(withIdentifier identifier: String?, sender: Any?) -> Bool {
+        
+        if identifier == "deleteNote" {
+            
+            if((subNoteArray?.count)! > 0){
+            
+            let optionMenu = UIAlertController(title: nil, message: "Delete this Note", preferredStyle: .actionSheet)
+            
+            let deleteAction = UIAlertAction(title: "Delete", style: .default, handler: {
+                (alert: UIAlertAction!) -> Void in
+                self.deleteNote(sender: sender)
+            })
+            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: {
+                (alert: UIAlertAction!) -> Void in
+                print("Cancelled")
+            })
+            
+            optionMenu.addAction(deleteAction)
+            optionMenu.addAction(cancelAction)
+            optionMenu.popoverPresentationController?.barButtonItem = self.navigationItem.rightBarButtonItem
+            self.present(optionMenu, animated: true) {
+                    print("Delete option presented")
+                }
+                return false
+            }
+            else{
+                return true
+            }
+        }
+        else{
+            return true
+        }
+    }
+
     // MARK: - TextField Methods
 
     func textFieldDidChange(textField: UITextField) {
@@ -586,13 +625,10 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         let myImageOptionsView : UIView! = currentCell.contentView.viewWithTag(imageOptionsViewDefaultTag) as UIView!
         myImageOptionsView.isHidden = true
         let mySubNoteObj = subNoteArray?[currentIndexpath.row]
+        
         // Removing image from local folder
-        let filePath = "\(imagesDirectoryPath!)/\(mySubNoteObj?.imageName ?? "")"
-        do {
-            try FileManager.default.removeItem(atPath: filePath)
-        } catch let error as NSError {
-            print(error.debugDescription)
-        }
+        self.deleteFileWithImageName(imageName: (mySubNoteObj?.imageName ?? ""))
+        
         deleteCell(atIndex: currentIndexpath.row)
     }
     
@@ -628,6 +664,23 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
                 }
             })
         }
+    }
+    
+    // Delete note
+    
+
+    
+    func deleteNote(sender : Any?)
+    {
+        for subNoteObj in subNoteArray!
+        {
+            if(subNoteObj.type == contentType.image.rawValue)
+            {
+                self.deleteFileWithImageName(imageName: subNoteObj.imageName)
+            }
+        }
+        subNoteArray?.removeAll()
+        performSegue(withIdentifier: "deleteNote", sender: sender)
     }
     
     //Creating new cell
@@ -702,78 +755,90 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
     func cropViewControllerDidCancel(_ controller: CropViewController) {
         controller.dismiss(animated: true, completion: nil)
     }
+    
+    
+    // MARK: - Helper methods
+    
+    func fixOrientation(image: UIImage) -> UIImage {
+        // No-op if the orientation is already correct
+        if (image.imageOrientation == UIImageOrientation.up) { return image; }
+        
+        print(image.imageOrientation)
+        
+        // We need to calculate the proper transformation to make the image upright.
+        // We do it in 2 steps: Rotate if Left/Right/Down, and then flip if Mirrored.
+        var transform = CGAffineTransform.identity
+        
+        switch (image.imageOrientation) {
+        case .down, .downMirrored:
+            transform = transform.translatedBy(x: image.size.width, y: image.size.height)
+            transform = transform.rotated(by: .pi)
+            break
+        case .left, .leftMirrored:
+            transform = transform.translatedBy(x: image.size.width, y: 0)
+            transform = transform.rotated(by: .pi/2)
+            break
+        case .right, .rightMirrored:
+            transform = transform.translatedBy(x: 0, y: image.size.height)
+            transform = transform.rotated(by: -.pi/2)
+            break
+        case .up, .upMirrored:
+            break
+        }
+        
+        switch (image.imageOrientation) {
+        case .upMirrored, .downMirrored:
+            transform = transform.translatedBy(x: image.size.width, y: 0)
+            transform = transform.scaledBy(x: -1, y: 1)
+            break
+        case .leftMirrored, .rightMirrored:
+            transform = transform.translatedBy(x: image.size.height, y: 0)
+            transform = transform.scaledBy(x: -1, y: 1)
+            break
+        case .up, .down, .left, .right:
+            break
+        }
+        
+        // Now we draw the underlying CGImage into a new context, applying the transform
+        // calculated above.
+        
+        let ctx = CGContext(data: nil, width: Int(image.size.width), height: Int(image.size.height), bitsPerComponent: image.cgImage!.bitsPerComponent, bytesPerRow: 0, space: image.cgImage!.colorSpace!, bitmapInfo: image.cgImage!.bitmapInfo.rawValue)
+        
+        ctx!.concatenate(transform);
+        
+        switch (image.imageOrientation) {
+        case .left, .leftMirrored, .right, .rightMirrored:
+            // Grr...
+            ctx?.draw(image.cgImage!, in: CGRect(origin: .zero, size: CGSize(width: image.size.height, height: image.size.width)))
+            
+            break
+            
+        default:
+            ctx?.draw(image.cgImage!, in: CGRect(origin: .zero, size: CGSize(width: image.size.width, height: image.size.height)))
+            break
+        }
+        
+        // And now we just create a new UIImage from the drawing context
+        let cgimg = ctx!.makeImage()
+        let img = UIImage(cgImage: cgimg!)
+        
+        return img
+    }
+
+    // Delete file with imageName
+    func deleteFileWithImageName(imageName : String)
+    {
+        if(imageName != ""){
+            
+            let filePath = "\(imagesDirectoryPath!)/\(imageName)"
+            do {
+                try FileManager.default.removeItem(atPath: filePath)
+            } catch let error as NSError {
+                print(error.debugDescription)
+            }
+        }
+    }
+
    
 }
 
-func fixOrientation(image: UIImage) -> UIImage {
-    // No-op if the orientation is already correct
-    if (image.imageOrientation == UIImageOrientation.up) { return image; }
-    
-    print(image.imageOrientation)
-    
-    // We need to calculate the proper transformation to make the image upright.
-    // We do it in 2 steps: Rotate if Left/Right/Down, and then flip if Mirrored.
-    var transform = CGAffineTransform.identity
-    
-    switch (image.imageOrientation) {
-    case .down, .downMirrored:
-        transform = transform.translatedBy(x: image.size.width, y: image.size.height)
-        transform = transform.rotated(by: .pi)
-        break
-    case .left, .leftMirrored:
-        transform = transform.translatedBy(x: image.size.width, y: 0)
-        transform = transform.rotated(by: .pi/2)
-        break
-    case .right, .rightMirrored:
-        transform = transform.translatedBy(x: 0, y: image.size.height)
-        transform = transform.rotated(by: -.pi/2)
-        break
-    case .up, .upMirrored:
-        break
-    }
-    
-    switch (image.imageOrientation) {
-    case .upMirrored, .downMirrored:
-        transform = transform.translatedBy(x: image.size.width, y: 0)
-        transform = transform.scaledBy(x: -1, y: 1)
-        break
-    case .leftMirrored, .rightMirrored:
-        transform = transform.translatedBy(x: image.size.height, y: 0)
-        transform = transform.scaledBy(x: -1, y: 1)
-        break
-    case .up, .down, .left, .right:
-        break
-    }
-    
-    // Now we draw the underlying CGImage into a new context, applying the transform
-    // calculated above.
-    
-    let ctx = CGContext(data: nil, width: Int(image.size.width), height: Int(image.size.height), bitsPerComponent: image.cgImage!.bitsPerComponent, bytesPerRow: 0, space: image.cgImage!.colorSpace!, bitmapInfo: image.cgImage!.bitmapInfo.rawValue)
-    
-    ctx!.concatenate(transform);
-    
-    switch (image.imageOrientation) {
-    case .left, .leftMirrored, .right, .rightMirrored:
-        // Grr...
-        ctx?.draw(image.cgImage!, in: CGRect(origin: .zero, size: CGSize(width: image.size.height, height: image.size.width)))
-        
-        break
-        
-    default:
-        ctx?.draw(image.cgImage!, in: CGRect(origin: .zero, size: CGSize(width: image.size.width, height: image.size.height)))
-        break
-    }
-    
-    // And now we just create a new UIImage from the drawing context
-    let cgimg = ctx!.makeImage()
-    let img = UIImage(cgImage: cgimg!)
-    
-    return img
-}
-
-extension UITextField {
-    func setCursor(position: Int) {
-        let position = self.position(from: beginningOfDocument, offset: position)!
-        selectedTextRange = textRange(from: position, to: position)
-    }
-}

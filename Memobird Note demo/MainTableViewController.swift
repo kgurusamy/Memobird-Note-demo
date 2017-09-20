@@ -117,7 +117,7 @@ class MainTableViewController: UITableViewController,UISearchResultsUpdating  {
             
         }, completion: { (finished: Bool) in
             
-            let indexPath = IndexPath(row: self.notes.count-1, section: 0)
+            let indexPath = IndexPath(row:0, section: 0)
             self.tableView.selectRow(at: indexPath, animated: true, scrollPosition: .top)
             self.performSegue(withIdentifier: "edit", sender: self)
         })
@@ -130,7 +130,15 @@ class MainTableViewController: UITableViewController,UISearchResultsUpdating  {
         let index = detailViewController.index
         let subModel : [subNote]! = detailViewController.subNoteArray
       
+        if(subModel.count == 1 && (subModel[0].text == "" || subModel[0].text == " "))
+        {
+                CoreDataStack.managedObjectContext.delete(notes[index!])
+                CoreDataStack.saveContext()
+        }
+        else {
         let fetchRequest: NSFetchRequest<Notes> = Notes.fetchRequest()
+        let sort = NSSortDescriptor(key: "modified_time", ascending: false)
+        fetchRequest.sortDescriptors = [sort]
      
         do {
             let records = try CoreDataStack.managedObjectContext.fetch(fetchRequest)
@@ -158,10 +166,29 @@ class MainTableViewController: UITableViewController,UISearchResultsUpdating  {
             }
 
             } catch {
-            print(error)
+                print(error)
             }
             CoreDataStack.saveContext()
+            }
+       
+        getSavedData()
+        tableView.reloadData()
+    }
+    
+    @IBAction func deleteNotePressed(_ segue:UIStoryboardSegue)
+    {
+        if segue.identifier == "deleteNote" {
+            
+            let detailViewController = segue.source as! DetailTableViewController
+            let index = detailViewController.index
+            
+            // Delete Note from coreData
+            CoreDataStack.managedObjectContext.delete(notes[index!])
+            CoreDataStack.saveContext()
+
+            getSavedData()
             tableView.reloadData()
+        }
     }
 
   
@@ -184,7 +211,6 @@ class MainTableViewController: UITableViewController,UISearchResultsUpdating  {
             {
                 detailViewController.subNoteArray = nil
             }
-            //detailViewController.subNoteArray = notes[(path?.row)!].subNote as? [subNote]
         }
     }
     
@@ -213,6 +239,10 @@ class MainTableViewController: UITableViewController,UISearchResultsUpdating  {
     func getSavedData()
     {
         let fetchRequest: NSFetchRequest<Notes> = Notes.fetchRequest()
+        
+        // Sorting data according to modified time
+        let sort = NSSortDescriptor(key: "modified_time", ascending: false)
+        fetchRequest.sortDescriptors = [sort]
         
         do {
 
