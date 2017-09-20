@@ -99,7 +99,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
                 cell?.isHidden = true
                 var center = cell?.center
 
-                My.cellSnapshot?.frame = CGRect(x:(My.cellSnapshot?.frame.origin.x)!, y:(My.cellSnapshot?.frame.origin.y)!,width:(My.cellSnapshot?.frame.size.width)!, height : 40)
+                My.cellSnapshot?.frame = CGRect(x:(My.cellSnapshot?.frame.origin.x)!, y:(My.cellSnapshot?.frame.origin.y)!,width:(My.cellSnapshot?.frame.size.width)!, height : 48)
                 My.cellSnapshot!.center = center!
                 My.cellSnapshot!.alpha = 0.0
                 tableView.addSubview(My.cellSnapshot!)
@@ -136,7 +136,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             if My.cellSnapshot != nil {
                 var center = My.cellSnapshot!.center
                 center.y = locationInView.y
-                My.cellSnapshot?.frame = CGRect(x:(My.cellSnapshot?.frame.origin.x)!, y:(My.cellSnapshot?.frame.origin.y)!,width:(My.cellSnapshot?.frame.size.width)!, height : 40)
+                My.cellSnapshot?.frame = CGRect(x:(My.cellSnapshot?.frame.origin.x)!, y:(My.cellSnapshot?.frame.origin.y)!,width:(My.cellSnapshot?.frame.size.width)!, height : 48)
                 My.cellSnapshot!.center = center
                 if ((indexPath != nil) && (indexPath != Path.initialIndexPath)) {
                     subNoteArray?.insert((subNoteArray?.remove(at: Path.initialIndexPath!.row))!, at: indexPath!.row)
@@ -233,7 +233,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             {
                 if( dragselectedRowIndex == indexPath.row)
                 {
-                    height = 40
+                    height = 48
                 }
                 else
                 {
@@ -246,7 +246,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
                 {
                     if (dragimageselected == true)
                     {
-                        height = 40
+                        height = 48
                     }
                     else
                     {
@@ -260,7 +260,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             }
             //return 240
         }else{
-            height = 40
+            height = 48
         }
         return height
     }
