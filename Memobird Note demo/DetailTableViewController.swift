@@ -12,7 +12,7 @@ import Photos
 import AssetsLibrary
 let textFieldDefaultTag = 10
 let imageViewDefaultTag = 20
-let imageBGViewDefaultTag = 80
+        let imageBGViewDefaultTag = 80
 let imageOptionsViewDefaultTag = 30
 let longPressButtonDefaultTag = 40
 let imageDescriptionDefaultTag = 50
@@ -52,10 +52,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         
         if(subNoteArray == nil){
             subNoteArray = []
-            //let emptyImage:UIImage? = nil
-            let emptyNote = subNote(type : contentType.text.rawValue, imageName: "some image name",text: " ")
-            
-            //let emptyString :String = " "
+            let emptyNote = subNote(type : contentType.text.rawValue, imageName: "",text: " ")
             subNoteArray?.insert(emptyNote,at: 0)
         }
         
@@ -88,10 +85,8 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         switch state {
         case UIGestureRecognizerState.began:
             if indexPath != nil {
-                tableView.beginUpdates()
-                tableView.endUpdates()
+//              tableView.rowHeight = UITableViewAutomaticDimension
                 tableView.reloadData()
-                tableView.rowHeight = UITableViewAutomaticDimension
                 dragimageselected = true
                 Path.initialIndexPath = indexPath
                 let cell = tableView.cellForRow(at: indexPath!) as UITableViewCell!
@@ -129,8 +124,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             
         case UIGestureRecognizerState.changed:
             if(indexPath != nil){
-                tableView.beginUpdates()
-                tableView.endUpdates()
+               
             viewHasMoved = true
             movingCellIndexPath = indexPath as NSIndexPath?
             if My.cellSnapshot != nil {
@@ -146,8 +140,6 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             }
             }
         default:
-            tableView.beginUpdates()
-            tableView.endUpdates()
             viewHasMoved = false
             dragimageselected = false
             if Path.initialIndexPath != nil {
@@ -258,7 +250,7 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
                     height = 280
                 }
             }
-            //return 240
+           
         }else{
             height = 48
         }
@@ -300,8 +292,8 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
 
             let myTextField : UITextField! = cell.contentView.viewWithTag(textFieldDefaultTag) as! UITextField!
             let myImageView : UIImageView! = cell.contentView.viewWithTag(imageViewDefaultTag) as! UIImageView!
-            
             myImageView.image = nil
+            
             myTextField.delegate = self
             myTextField.font = .systemFont(ofSize: 18)
             myTextField.text = subNoteArray?[indexPath.row].text
@@ -316,7 +308,6 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
             }
             myTextField.isHidden = false
             ImageBGView.isHidden = true
-            self.setInitialFocus()
 
             let longPressButton : UIButton! = cell.contentView.viewWithTag(longPressButtonDefaultTag) as! UIButton!
             longPressButton.isHidden = true
@@ -373,11 +364,14 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
            
             myImageView.accessibilityIdentifier = customImageObj?.imageName
             if(data != nil){
-                myImageView.image = UIImage(data: data!)
+                let actualImage = UIImage(data: data!)
+                myImageView.image = actualImage
+
             }
             
             let imageDescription : UITextField! = cell.contentView.viewWithTag(imageDescriptionDefaultTag) as? UITextField
-            imageDescription?.frame = CGRect(x : 30, y: 246, width : tableView.frame.size.width-60, height:30)
+            imageDescription?.frame = CGRect(x : 30, y: cell.contentView.frame.height-33, width : tableView.frame.size.width-60, height:30)
+            
             imageDescription.delegate = self
             imageDescription.font = .systemFont(ofSize: 12)
             imageDescription.placeholder = "Picture Description"
@@ -392,8 +386,6 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
                 imageDescription.isHidden = true
             }
         }
-        tableView.beginUpdates()
-        tableView.endUpdates()
         cell.selectionStyle = .none
         // Configure the cell...
         return cell
@@ -606,7 +598,13 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         
         myphotoedittextfiled.isHidden = false
         myImageOptionsView.isHidden = true
-        self.setInitialFocuspicturedescription()
+        
+        if(myphotoedittextfiled != nil)
+        {
+            currentCell?.setSelected(true, animated:true)
+            myphotoedittextfiled.delegate = self
+            myphotoedittextfiled.becomeFirstResponder()
+        }
     }
     // MARK: - Custom methods
     
@@ -745,19 +743,6 @@ class DetailTableViewController: UITableViewController, UITextFieldDelegate, UII
         }
     }
     
-    func setInitialFocuspicturedescription()
-    {
-        let indexPaths  = indexPathsForRowsInSection(0, numberOfRows: tableView.numberOfRows(inSection: 0))
-        let cell =  self.tableView.cellForRow(at: (indexPaths[(subNoteArray?.count)!-1]) as IndexPath)
-        if((cell?.contentView.viewWithTag(imageDescriptionDefaultTag)) != nil)
-        {
-            cell?.setSelected(true, animated:true)
-            let currentTextField : UITextField! = cell!.contentView.viewWithTag(imageDescriptionDefaultTag) as! UITextField
-            currentTextField.delegate = self
-            currentTextField.becomeFirstResponder()
-        }
-    }
-
     // Getting indexPaths for all rows
     func indexPathsForRowsInSection(_ section: Int, numberOfRows: Int) -> [NSIndexPath] {
         return (0..<numberOfRows).map{NSIndexPath(row: $0, section: section)}
